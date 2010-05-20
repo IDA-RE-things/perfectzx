@@ -1,0 +1,10 @@
+syntax: glob
+*.orig
+*.rej
+*~
+*.bak
+*.o
+tests/*.err
+bin/
+obj/
+z80ex*/

@@ -1,10 +1,10 @@
 #include "../main.h"
 #include "../devices.h"
-#include "../sound_oss.h"
+#include "../sound.h"
 
 static unsigned long last_tstate;
 
-double volume_ay = 15000.0;
+double volume_ay = 2500.0;
 
 const double dac_val[16]=
 {
@@ -125,8 +125,8 @@ static void process_ay( unsigned long tstate )
     while ( tstate > last_tstate )
     {
         ay_tick( &ay );
-        add_sound_f( last_tstate, last_tstate + 2 * 16, zxcpu_tstates_frame / 32, dac_val[ay.sound[1]] * volume_ay );
-        last_tstate += 2 * 16;
+        add_sound_nf( last_tstate, last_tstate + 64, zxcpu_tstates_frame, dac_val[ay.sound[0] + ay.sound[1] + ay.sound[2]] * volume_ay );
+        last_tstate += 64;
     }
 }
 

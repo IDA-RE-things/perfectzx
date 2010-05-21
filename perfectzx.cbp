@@ -52,6 +52,7 @@
 			<Add library="z80ex-1.1.18/lib/libz80ex.a" />
 			<Add library="gthread-2.0" />
 			<Add library="rt" />
+			<Add library="asound" />
 		</Linker>
 		<Unit filename="devices.h" />
 		<Unit filename="devices/psg.c">
@@ -77,10 +78,16 @@
 			<Option weight="0" />
 		</Unit>
 		<Unit filename="main.h" />
+		<Unit filename="sound.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sound.h" />
+		<Unit filename="sound_alsa.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="sound_oss.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="sound_oss.h" />
 		<Unit filename="sync_timer.c">
 			<Option compilerVar="CC" />
 		</Unit>

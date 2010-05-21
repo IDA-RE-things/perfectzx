@@ -9,7 +9,7 @@ const char emul_version[] = "0000 (development version)";
 #include "input.h"
 
 #include "sync_timer.h"
-#include "sound_oss.h"
+#include "sound.h"
 void (*sync_wait)(void);
 void (*sync_start)(void);
 void (*sync_stop)(void);
@@ -45,6 +45,7 @@ void emul_start()
 void emul_stop()
 {
     emul_running = 0;
+    printf( "Stopping emulator...\n" );
 #ifdef  WINDOWS
 	WaitForSingleObject(emul_thread, INFINITE);
 #else
@@ -64,9 +65,12 @@ void emul_init()
 	/*sync_wait = timer_sync;
 	sync_start = timer_start;
 	sync_stop = timer_stop;*/
-	sync_wait = sound_flush;
-	sync_start = sound_init;
-	sync_stop = sound_uninit;
+	/*sync_wait = sound_oss_flush;
+	sync_start = sound_oss_init;
+	sync_stop = sound_oss_uninit;*/
+	sync_wait = sound_alsa_flush;
+	sync_start = sound_alsa_init;
+	sync_stop = sound_alsa_uninit;
 
     printf("Initializing video...\n");
     video_init();

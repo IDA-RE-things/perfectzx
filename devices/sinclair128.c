@@ -1,7 +1,7 @@
 #include "../main.h"
 #include "../devices.h"
 
-#include "../sound_oss.h"
+#include "../sound.h"
 
 #define ROM_PAGE(p) (mem_rom+(p)*0x4000)
 #define RAM_PAGE(p) (mem_ram+(p)*0x4000)
@@ -41,7 +41,7 @@ static void frame()
     video_render_std(zxcpu_tstates);
     video_last_tstate = 0;
 
-    add_sound_f( beeper_last_tstate, zxcpu_tstates_frame, zxcpu_tstates_frame, beeper_st ? volume_beep : 0.0 );
+    add_sound_nf( beeper_last_tstate, zxcpu_tstates_frame, zxcpu_tstates_frame, beeper_st ? volume_beep : 0.0 );
     beeper_last_tstate = 0;
     //video_render_std_fast();
 }
@@ -69,9 +69,9 @@ static int port_out(Z80EX_CONTEXT *cpu, Z80EX_WORD port, Z80EX_BYTE value)
         video_render_std(zxcpu_tstates);
         video_border = value & 7;
 
-        add_sound_f( beeper_last_tstate, zxcpu_tstates, zxcpu_tstates_frame, beeper_st ? volume_beep : 0.0 );
+        add_sound_nf( beeper_last_tstate, zxcpu_tstates, zxcpu_tstates_frame, beeper_st ? volume_beep : 0.0 );
         beeper_last_tstate = zxcpu_tstates;
-        beeper_st = value & 0x18;
+        beeper_st = value & 0x10;
     }
 
     return 0;
@@ -95,6 +95,7 @@ static int port_in(Z80EX_CONTEXT *cpu, Z80EX_WORD port, Z80EX_BYTE *value)
 static void init()
 {
     int res;
+
 	zxcpu_tstates_frame = 69888;
 
 	mem_rom = (Z80EX_BYTE*)malloc(2*0x4000);

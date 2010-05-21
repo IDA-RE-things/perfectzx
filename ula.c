@@ -151,7 +151,8 @@ void zx_init()
 
     // construct machine
     SDevice *zxtest[] = {
-            &zxdevice_sinclair128
+            &zxdevice_sinclair128,
+            &zxdevice_ay,
     };
     zx_create_machine(zxtest, sizeof(zxtest) / sizeof(SDevice*));
 

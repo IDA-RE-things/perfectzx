@@ -4,14 +4,14 @@
 	<File name="devices.h" open="0" top="0" tabpos="6">
 		<Cursor position="1456" topLine="18" />
 	</File>
-	<File name="devices/psg.c" open="1" top="0" tabpos="3">
-		<Cursor position="3755" topLine="123" />
+	<File name="devices/psg.c" open="1" top="1" tabpos="5">
+		<Cursor position="2546" topLine="96" />
 	</File>
-	<File name="devices/sinclair128.c" open="1" top="0" tabpos="4">
-		<Cursor position="313" topLine="0" />
+	<File name="devices/sinclair128.c" open="0" top="0" tabpos="4">
+		<Cursor position="971" topLine="10" />
 	</File>
-	<File name="emul.c" open="0" top="0" tabpos="3">
-		<Cursor position="1079" topLine="15" />
+	<File name="emul.c" open="1" top="0" tabpos="2">
+		<Cursor position="890" topLine="18" />
 	</File>
 	<File name="emul.h" open="0" top="0" tabpos="4">
 		<Cursor position="131" topLine="0" />
@@ -34,11 +34,17 @@
 	<File name="main.h" open="0" top="0" tabpos="5">
 		<Cursor position="75" topLine="0" />
 	</File>
-	<File name="sound_oss.c" open="1" top="0" tabpos="1">
-		<Cursor position="1626" topLine="38" />
+	<File name="sound.c" open="1" top="0" tabpos="1">
+		<Cursor position="529" topLine="0" />
 	</File>
-	<File name="sound_oss.h" open="1" top="1" tabpos="2">
-		<Cursor position="186" topLine="0" />
+	<File name="sound.h" open="0" top="0" tabpos="2">
+		<Cursor position="518" topLine="0" />
+	</File>
+	<File name="sound_alsa.c" open="0" top="0" tabpos="0">
+		<Cursor position="738" topLine="0" />
+	</File>
+	<File name="sound_oss.c" open="0" top="0" tabpos="1">
+		<Cursor position="204" topLine="6" />
 	</File>
 	<File name="sync_timer.c" open="0" top="0" tabpos="9">
 		<Cursor position="1592" topLine="57" />
@@ -46,10 +52,10 @@
 	<File name="sync_timer.h" open="0" top="0" tabpos="6">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="ula.c" open="0" top="0" tabpos="11">
-		<Cursor position="122" topLine="0" />
+	<File name="ula.c" open="1" top="0" tabpos="3">
+		<Cursor position="4122" topLine="74" />
 	</File>
-	<File name="ula.h" open="0" top="0" tabpos="0">
+	<File name="ula.h" open="1" top="0" tabpos="4">
 		<Cursor position="17" topLine="0" />
 	</File>
 	<File name="video.c" open="0" top="0" tabpos="8">

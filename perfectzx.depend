@@ -1977,12 +1977,12 @@
 1271058059 /usr/include/gtk-2.0/gtk/gtktipsquery.h
 	<gtk/gtk.h>
 
-1274353696 source:/home/las/programming/perfectzx/devices/sinclair128.c
+1274448171 source:/home/las/programming/perfectzx/devices/sinclair128.c
 	"../main.h"
 	"../devices.h"
-	"../sound_oss.h"
+	"../sound.h"
 
-1274264740 source:/home/las/programming/perfectzx/emul.c
+1274448491 source:/home/las/programming/perfectzx/emul.c
 	"main.h"
 	"z80ex.h"
 	"emul.h"
@@ -1990,7 +1990,7 @@
 	"video.h"
 	"input.h"
 	"sync_timer.h"
-	"sound_oss.h"
+	"sound.h"
 
 1272873291 source:/home/las/programming/perfectzx/main.c
 	"main.h"
@@ -2016,7 +2016,7 @@
 	<string.h>
 	<pthread.h>
 
-1266180051 source:/home/las/programming/perfectzx/ula.c
+1274444220 source:/home/las/programming/perfectzx/ula.c
 	"main.h"
 	"ula.h"
 	"devices.h"
@@ -2136,19 +2136,29 @@
 
 1271058057 /usr/lib64/gtk-2.0/include/gdkconfig.h
 
-1274346588 /home/las/programming/perfectzx/sound_oss.h
+1274443948 /home/las/programming/perfectzx/sound_oss.h
 
-1274353712 source:/home/las/programming/perfectzx/sound_oss.c
+1274447496 source:/home/las/programming/perfectzx/sound_oss.c
 	<stdio.h>
 	<fcntl.h>
 	<unistd.h>
 	<sys/ioctl.h>
 	<sys/soundcard.h>
 	<string.h>
-	"sound_oss.h"
+	"sound.h"
 
-1274353681 source:/home/las/programming/perfectzx/devices/psg.c
+1274448416 source:/home/las/programming/perfectzx/devices/psg.c
 	"../main.h"
 	"../devices.h"
-	"../sound_oss.h"
+	"../sound.h"
+
+1274448145 source:/home/las/programming/perfectzx/sound.c
+	"sound.h"
+
+1274448416 /home/las/programming/perfectzx/sound.h
+
+1274447496 source:/home/las/programming/perfectzx/sound_alsa.c
+	<stdio.h>
+	<alsa/asoundlib.h>
+	"sound.h"
 

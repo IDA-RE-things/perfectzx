@@ -3,15 +3,14 @@
 
 #include "sound.h"
 
-
-snd_pcm_t *sndh;
+static snd_pcm_t *sndh;
 
 void sound_alsa_init()
 {
     snd_pcm_hw_params_t *hw_params;
     unsigned rate = 48000;
 
-    snd_pcm_open( &sndh, "plughw:0,0", SND_PCM_STREAM_PLAYBACK, 0 );
+    snd_pcm_open( &sndh, "hw:0,0", SND_PCM_STREAM_PLAYBACK, 0 );
 
     snd_pcm_hw_params_malloc( &hw_params );
     snd_pcm_hw_params_any( sndh, hw_params );

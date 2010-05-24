@@ -14,7 +14,7 @@ void (*sync_wait)(void);
 void (*sync_start)(void);
 void (*sync_stop)(void);
 
-int emul_running;
+volatile int emul_running;
 #ifdef  WINDOWS
 HANDLE emul_thread;
 DWORD emul_thread_id;
@@ -26,8 +26,11 @@ void *emul_loop(void *arg)
 {
     sync_start();
     //sync_wait();
-   	while (emul_running) zx_quantum();
+   	while ( emul_running )
+        zx_quantum();
+
     sync_stop();
+
 	return 0;
 }
 
@@ -45,7 +48,6 @@ void emul_start()
 void emul_stop()
 {
     emul_running = 0;
-    printf( "Stopping emulator...\n" );
 #ifdef  WINDOWS
 	WaitForSingleObject(emul_thread, INFINITE);
 #else
@@ -65,12 +67,12 @@ void emul_init()
 	/*sync_wait = timer_sync;
 	sync_start = timer_start;
 	sync_stop = timer_stop;*/
-	/*sync_wait = sound_oss_flush;
+	sync_wait = sound_oss_flush;
 	sync_start = sound_oss_init;
-	sync_stop = sound_oss_uninit;*/
-	sync_wait = sound_alsa_flush;
+	sync_stop = sound_oss_uninit;
+	/*sync_wait = sound_alsa_flush;
 	sync_start = sound_alsa_init;
-	sync_stop = sound_alsa_uninit;
+	sync_stop = sound_alsa_uninit;*/
 
     printf("Initializing video...\n");
     video_init();

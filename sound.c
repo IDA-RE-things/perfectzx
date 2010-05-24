@@ -14,7 +14,7 @@ void add_sound_f( unsigned begin, unsigned end, unsigned measures, double val )
 	end_fr = ( ( (double)end / (double)measures) * bufferFrames );
 	if ( st_fr == end_fr )
 	{
-		st_off = (double)end-begin / (double)measures * bufferFrames;
+		st_off = (double)( end - begin ) / (double)measures * bufferFrames;
 		sound_buffer[st_fr] += val * st_off;
 	}
     else

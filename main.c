@@ -32,6 +32,12 @@ static gboolean event_key(GtkWidget *window, GdkEventKey *event, GPtrArray *parr
 
 void video_update()
 {
+    if ( !emul_running )
+    {
+        printf( "Emul not running?\n" );
+        return;
+    }
+
     // get GTK thread lock
     gdk_threads_enter();
     // update screen

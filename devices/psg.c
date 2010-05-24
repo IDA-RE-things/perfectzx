@@ -125,21 +125,23 @@ static void process_ay( unsigned long tstate )
     while ( tstate > last_tstate )
     {
         ay_tick( &ay );
-        add_sound_nf( last_tstate, last_tstate + 64, zxcpu_tstates_frame, dac_val[ay.sound[0] + ay.sound[1] + ay.sound[2]] * volume_ay );
-        last_tstate += 64;
+        add_sound_nf( last_tstate, last_tstate + 16, zxcpu_tstates_frame, (dac_val[ay.sound[0]] +
+                                                                           dac_val[ay.sound[1]] +
+                                                                           dac_val[ay.sound[2]]) * volume_ay );
+        last_tstate += 16;
     }
 }
 
-static void reset(){
-
+static void reset()
+{
+    process_ay( zxcpu_tstates );
+    memset( &ay, 0, sizeof( struct ay_t ) );
 }
 
 static void frame()
 {
-    // update rest of the screen
     process_ay( zxcpu_tstates );
     last_tstate = 0;
-    //video_render_std_fast();
 }
 
 static int port_out(Z80EX_CONTEXT *cpu, Z80EX_WORD port, Z80EX_BYTE value)
@@ -183,7 +185,6 @@ static int port_in(Z80EX_CONTEXT *cpu, Z80EX_WORD port, Z80EX_BYTE *value)
 
 static void init()
 {
-//    int res;
 	last_tstate = 0;
 }
 

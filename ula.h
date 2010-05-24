@@ -3,7 +3,7 @@
 #ifndef PZX_ULA
 #define PZX_ULA
 
-//extern Z80EX_CONTEXT *zxcpu;
+extern Z80EX_CONTEXT *zxcpu;
 extern unsigned long zxcpu_tstates;
 
 // cpu callback procedures

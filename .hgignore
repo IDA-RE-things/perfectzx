@@ -7,4 +7,5 @@ syntax: glob
 tests/*.err
 bin/
 obj/
+Snapshots/
 z80ex*/

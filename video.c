@@ -1,4 +1,5 @@
 #include "main.h"
+#include "ula.h"
 
 typedef struct
 {
@@ -21,7 +22,7 @@ unsigned char std_ink[256], std_paper[256];
 unsigned short std_adr_ptrn[192], std_adr_attr[192];
 unsigned std_flash_counter;
 
-void video_render_std(unsigned long tstate)
+void video_render_std_s(unsigned long tstate)
 {
     while (video_last_tstate < tstate)
     {
@@ -36,7 +37,7 @@ void video_render_std(unsigned long tstate)
             video_last_tstate = 224 * (56-24);
         // bottom nonviewable area
         else if (video_last_tstate >= ((56+192+24)*224))
-            video_last_tstate = 224 * 312;
+            video_last_tstate = zxcpu_tstates_frame;//224 * 312;
         // viewable area
         else
         {
@@ -82,6 +83,79 @@ void video_render_std(unsigned long tstate)
                 {
                     unsigned long border_end;
                     border_end = (line >= 56 && line < (56+192) && line_x < (32+128))? (line*224+32) : ((line+1)*224);
+                    border_end = (tstate < border_end) ? tstate : border_end;
+                    for(;video_last_tstate < border_end; video_last_tstate++)
+                    {
+                        vid_buffer_out[(out_x++) + (out_y*320)] = video_palette[video_border];
+                        vid_buffer_out[(out_x++) + (out_y*320)] = video_palette[video_border];
+                    }
+                }
+            }
+        }
+    }
+}
+
+void video_render_std(unsigned long tstate)
+{
+    while (video_last_tstate < tstate)
+    {
+        unsigned line, line_x;
+        unsigned out_x, out_y;
+
+        if ( video_last_tstate == 0 )
+            std_flash_counter = (std_flash_counter + 1) % 32;
+
+        // top nonviewable area
+        if (video_last_tstate < ((48-24)*224))
+            video_last_tstate = 224 * (48-24);
+        // bottom nonviewable area
+        else if (video_last_tstate >= ((48+192+24)*224))
+            video_last_tstate = zxcpu_tstates_frame;//224 * 312;
+        // viewable area
+        else
+        {
+            line = video_last_tstate / 224;
+            line_x = video_last_tstate % 224;
+
+            out_y = line - (48-24);
+
+            // left nonviewable area
+            if (line_x < (0+32-16))
+                video_last_tstate = line * 224 + (0+32-16);
+            // right nonviewable area
+            else if (line_x >= (32+128+16))
+                video_last_tstate = (line + 1) * 224;
+            // viewable area
+            else
+            {
+                out_x = line_x*2 - (64-32);
+
+                // screen
+                if (line >= 48 && line < (48+192) && line_x >= 32 &&  line_x < (32+128))
+                {
+                    unsigned line_char, scr_line;
+
+                    line_char = (line_x-32)/4;
+                    video_last_tstate = line*224+line_char*4+32;  // align tstates
+                    for (; (line_char < 32) && (video_last_tstate < tstate); line_char++)
+                    {
+                        scr_line = line - 48;
+                        unsigned char pattern, attribute;
+                        pattern = video_memory[line_char | std_adr_ptrn[scr_line]];
+                        attribute = video_memory[line_char | std_adr_attr[scr_line]];
+                        if ( (attribute & 0x80) && std_flash_counter >= 16 )
+                            pattern ^= 0xFF;
+                        unsigned i;
+                        for (i = 0; i < 8; i++)
+                            vid_buffer_out[out_x++ + out_y*320] = video_palette[(pattern&(1<<(7-i)))? std_ink[attribute]:std_paper[attribute]];
+                        video_last_tstate += 4;
+                    }
+                }
+                // border
+                else
+                {
+                    unsigned long border_end;
+                    border_end = (line >= 48 && line < (48+192) && line_x < (32+128))? (line*224+32) : ((line+1)*224);
                     border_end = (tstate < border_end) ? tstate : border_end;
                     for(;video_last_tstate < border_end; video_last_tstate++)
                     {

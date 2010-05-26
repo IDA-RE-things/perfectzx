@@ -37,11 +37,19 @@ void sound_alsa_uninit()
 
 void sound_alsa_flush()
 {
+    int res;
     unsigned long towr = bufferFrames;
     signed short *sndb = sound_buffer;
 
     while ( towr )
-        towr -= snd_pcm_writei( sndh, sndb, towr );
+    {
+        if ( ( res = snd_pcm_writei( sndh, sndb, towr ) ) < 0 );
+        {
+            snd_pcm_prepare( sndh );
+            continue;
+        }
+        towr -= res;
+    }
 
     memset( sound_buffer, 0, bufferFrames * sizeof( SNDFRAME ) );
 }

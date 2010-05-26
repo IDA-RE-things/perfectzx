@@ -4,6 +4,10 @@
 SNDFRAME sound_buffer[480 * 2];
 unsigned long bufferFrames = 480 * 2;
 
+void add_sound_null( unsigned begin, unsigned end, unsigned measures, double val )
+{
+}
+
 void add_sound_f( unsigned begin, unsigned end, unsigned measures, double val )
 {
 	unsigned st_fr, end_fr;
@@ -40,3 +44,5 @@ void add_sound_nf( unsigned begin, unsigned end, unsigned measures, double val )
         sound_buffer[i] += val;
     }
 }
+
+void (*add_sound)( unsigned begin, unsigned end, unsigned measures, double val ) = add_sound_nf;

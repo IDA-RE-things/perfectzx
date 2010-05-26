@@ -4,7 +4,7 @@ syntax: glob
 *~
 *.bak
 *.o
-tests/*.err
+gmon*
 bin/
 obj/
 Snapshots/

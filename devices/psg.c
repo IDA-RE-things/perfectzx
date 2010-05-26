@@ -39,7 +39,7 @@ static struct ay_t
 			unsigned char control;
 			unsigned char channel_vol[3];
 			unsigned short envelope_period;
-			 unsigned char envelope_shape;
+            unsigned char envelope_shape;
 		};
 	};
 
@@ -125,9 +125,9 @@ static void process_ay( unsigned long tstate )
     while ( tstate > last_tstate )
     {
         ay_tick( &ay );
-        add_sound_nf( last_tstate, last_tstate + 16, zxcpu_tstates_frame, (dac_val[ay.sound[0]] +
-                                                                           dac_val[ay.sound[1]] +
-                                                                           dac_val[ay.sound[2]]) * volume_ay );
+        add_sound( last_tstate, last_tstate + 16, zxcpu_tstates_frame, (dac_val[ay.sound[0]] +
+                                                                        dac_val[ay.sound[1]] +
+                                                                        dac_val[ay.sound[2]]) * volume_ay );
         last_tstate += 16;
     }
 }
@@ -170,15 +170,11 @@ static int port_out(Z80EX_CONTEXT *cpu, Z80EX_WORD port, Z80EX_BYTE value)
 
 static int port_in(Z80EX_CONTEXT *cpu, Z80EX_WORD port, Z80EX_BYTE *value)
 {
-    /*PORT_TEST(0xFE, 0x01)
+    PORT_TEST(0xFFFD, 0xC002)
     {
-        unsigned i;
-        Z80EX_BYTE val = 0xFF;
-        for ( i = 0; i < 8; i ++ )
-            if ( (~port) & ( 0x0100 << i ) )
-                val &= zxkey_matrix[i];
-        *value = val;
-    }*/
+        if ( ay.reg_latch < 16 )
+            *value = ay.regs[ay.reg_latch];
+    }
 
     return 0;
 }
@@ -200,7 +196,7 @@ SDevice zxdevice_ay =
 		init, uninit,
 		reset,
 		frame,
-		NULL,
+		//NULL,
 		NULL, NULL,
 		NULL
 	};

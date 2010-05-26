@@ -14,7 +14,7 @@ void (*sync_wait)(void);
 void (*sync_start)(void);
 void (*sync_stop)(void);
 
-volatile int emul_running;
+int emul_running;
 #ifdef  WINDOWS
 HANDLE emul_thread;
 DWORD emul_thread_id;
@@ -25,9 +25,8 @@ void *emul_loop(void *arg)
 #endif
 {
     sync_start();
-    //sync_wait();
-   	while ( emul_running )
-        zx_quantum();
+
+    zx_life( &emul_running );
 
     sync_stop();
 

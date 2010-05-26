@@ -49,10 +49,11 @@
 		<Linker>
 			<Add option="`pkg-config gtk+-2.0 --libs`" />
 			<Add option="-pthread" />
-			<Add library="z80ex-1.1.18/lib/libz80ex.a" />
+			<Add library="z80ex" />
 			<Add library="gthread-2.0" />
 			<Add library="rt" />
 			<Add library="asound" />
+			<Add directory="z80ex-1.1.18/lib" />
 		</Linker>
 		<Unit filename="devices.h" />
 		<Unit filename="devices/psg.c">

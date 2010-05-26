@@ -53,24 +53,6 @@ void zx_destroy_machine()
 }
 
 // cpu callback procedures
-void zxcpu_tstate(Z80EX_CONTEXT *cpu, void *user_data)
-{
-    unsigned dev;
-    device_scan_asc(tstate)
-        zx_device[dev]->tstate( zxcpu_tstates );
-
-    if (++zxcpu_tstates >= zxcpu_tstates_frame)
-    {
-        // frame done
-        device_scan_asc(frame)
-            zx_device[dev]->frame();
-
-        zxcpu_tstates = 0;
-        video_update();
-        sync_wait();
-    }
-}
-
 Z80EX_BYTE zxcpu_memread(Z80EX_CONTEXT *cpu, Z80EX_WORD addr, int m1_state, void *user_data)
 {
     static Z80EX_BYTE value;
@@ -118,12 +100,29 @@ Z80EX_BYTE zxcpu_intread(Z80EX_CONTEXT *cpu, void *user_data)
     return 0xFF;
 }
 
-// minimal action
-void zx_quantum()
+// main cycle
+void zx_life( int *running )
 {
-    if ((zxcpu_tstates >= zxcpu_int_start) && (zxcpu_tstates < zxcpu_int_end))
-        z80ex_int(zxcpu);
-    z80ex_step(zxcpu);
+    unsigned dev;
+
+    while ( *running )
+    {
+        while ( zxcpu_tstates < zxcpu_tstates_frame )
+        {
+            if ((zxcpu_tstates >= zxcpu_int_start) && (zxcpu_tstates < zxcpu_int_end))
+                zxcpu_tstates += z80ex_int(zxcpu);
+            zxcpu_tstates += z80ex_step(zxcpu);
+        }
+
+        // frame done
+        device_scan_asc(frame)
+            zx_device[dev]->frame();
+
+        video_update();
+        sync_wait();
+
+        zxcpu_tstates %= zxcpu_tstates_frame;
+    }
 }
 
 // reset machine
@@ -143,7 +142,7 @@ void zx_init()
         zxcpu_portread, NULL,
         zxcpu_portwrite, NULL,
         zxcpu_intread, NULL);
-    z80ex_set_tstate_callback(zxcpu, zxcpu_tstate, NULL);
+    // z80ex_set_tstate_callback(zxcpu, zxcpu_tstate, NULL);
 
     // init device mechanism
     zx_device_count = 0;
@@ -155,9 +154,6 @@ void zx_init()
             &zxdevice_ay,
     };
     zx_create_machine(zxtest, sizeof(zxtest) / sizeof(SDevice*));
-
-    zxcpu_int_start = 304*224;
-    zxcpu_int_end = zxcpu_int_start + 32;
 }
 
 // destroy everything

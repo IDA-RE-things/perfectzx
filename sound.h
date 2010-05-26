@@ -6,6 +6,7 @@ typedef signed short SNDFRAME;
 extern SNDFRAME sound_buffer[480 * 2];
 extern unsigned long bufferFrames;
 
+void (*add_sound)( unsigned begin, unsigned end, unsigned measures, double val );
 void add_sound_f( unsigned begin, unsigned end, unsigned measures, double val );
 void add_sound_nf( unsigned begin, unsigned end, unsigned measures, double val );
 

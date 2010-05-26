@@ -32,26 +32,19 @@ static gboolean event_key(GtkWidget *window, GdkEventKey *event, GPtrArray *parr
 
 void video_update()
 {
-    if ( !emul_running )
-    {
-        printf( "Emul not running?\n" );
-        return;
-    }
-
     // get GTK thread lock
     gdk_threads_enter();
-    // update screen
-    gtk_widget_queue_draw(scr_area);
-    // flush commands
-    gdk_flush ();
+
+    if ( GTK_IS_WIDGET( scr_area ) )
+    {
+        // update screen
+        gtk_widget_queue_draw( scr_area );
+        // flush commands
+        gdk_flush();
+    }
+
     // release GTK thread lock
     gdk_threads_leave();
-}
-
-void emul_destroy()
-{
-    emul_uninit();
-    gtk_main_quit();
 }
 
 int main( int argc, char *argv[] )
@@ -76,7 +69,7 @@ int main( int argc, char *argv[] )
     gtk_window_set_icon(GTK_WINDOW(main_win), main_win_icon);
 
     gtk_widget_realize(main_win);
-    g_signal_connect(main_win, "destroy", emul_destroy, NULL);
+    g_signal_connect(main_win, "destroy", gtk_main_quit, NULL);
 
     // keyboard handlers
     g_signal_connect(main_win, "key-press-event", G_CALLBACK (event_key), NULL);
@@ -100,6 +93,8 @@ int main( int argc, char *argv[] )
     gdk_threads_enter();
 	gtk_main();
 	gdk_threads_leave();
+
+    emul_uninit();
 
     g_object_unref(G_OBJECT(scr_pixbuf));
 

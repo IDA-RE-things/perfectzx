@@ -42,7 +42,8 @@ static void frame()
     video_render_std( zxcpu_tstates_frame );
     video_last_tstate = 0;
 
-    add_sound( beeper_last_tstate, zxcpu_tstates_frame, zxcpu_tstates_frame, beeper_st ? volume_beep : 0.0 );
+    add_sound( beeper_last_tstate, zxcpu_tstates_frame, zxcpu_tstates_frame, beeper_st ? volume_beep : 0.0,
+                                                                             beeper_st ? volume_beep : 0.0 );
     beeper_last_tstate = 0;
 }
 
@@ -68,7 +69,8 @@ static int port_out(Z80EX_CONTEXT *cpu, Z80EX_WORD port, Z80EX_BYTE value)
         video_render_std(zxcpu_tstates);
         video_border = value & 7;
 
-        add_sound( beeper_last_tstate, zxcpu_tstates, zxcpu_tstates_frame, beeper_st ? volume_beep : 0.0 );
+        add_sound( beeper_last_tstate, zxcpu_tstates, zxcpu_tstates_frame, beeper_st ? volume_beep : 0.0,
+                                                                           beeper_st ? volume_beep : 0.0 );
         beeper_last_tstate = zxcpu_tstates;
         beeper_st = value & 0x10;
     }
@@ -181,7 +183,7 @@ static void init()
 	romf = fopen("128.rom", "rb");
 	res = fread(mem_rom, 0x4000, 2, romf);
 	fclose(romf);
-	load_sna( "Snapshots/met.sna", zxcpu );
+	load_sna( "Snapshots/shock.sna", zxcpu );
 
 	video_memory = RAM_PAGE(5);
 	video_border = 0x00;

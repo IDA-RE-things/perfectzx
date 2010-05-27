@@ -5,6 +5,7 @@ syntax: glob
 *.bak
 *.o
 gmon*
+*.layout
 bin/
 obj/
 Snapshots/

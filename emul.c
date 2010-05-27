@@ -1,4 +1,4 @@
-const char emul_version[] = "0000 (development version)";
+const char emul_version[] = "N/A (sekrit development version)";
 
 #include "main.h"
 
@@ -56,8 +56,8 @@ void emul_stop()
 
 void emul_init()
 {
-	printf("PerfectZX - ZX Spectrum emulator\n");
-	printf("Version %s by Molodtsov Alex\n", emul_version);
+	printf( "PerfectZX - ZX Spectrum emulator\n" );
+	printf( "Version %s (revision %d) by Molodtsov Alex\n", emul_version, HGVERSION + 1 );
 
 	Z80EX_VERSION *ver_z80ex;
 	ver_z80ex = z80ex_get_version();
@@ -69,9 +69,9 @@ void emul_init()
 	sync_wait = sound_oss_flush;
 	sync_start = sound_oss_init;
 	sync_stop = sound_oss_uninit;
-	/*sync_wait = sound_alsa_flush;
+	sync_wait = sound_alsa_flush;
 	sync_start = sound_alsa_init;
-	sync_stop = sound_alsa_uninit;*/
+	sync_stop = sound_alsa_uninit;
 
     printf("Initializing video...\n");
     video_init();

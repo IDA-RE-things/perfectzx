@@ -18,7 +18,7 @@ void sound_alsa_init()
     snd_pcm_hw_params_set_access( sndh, hw_params, SND_PCM_ACCESS_RW_INTERLEAVED );
     snd_pcm_hw_params_set_format( sndh, hw_params, SND_PCM_FORMAT_S16_LE );
     snd_pcm_hw_params_set_rate_near( sndh, hw_params, &rate, 0 );
-	snd_pcm_hw_params_set_channels( sndh, hw_params, 1 );
+	snd_pcm_hw_params_set_channels( sndh, hw_params, 2 );
 
 	snd_pcm_hw_params_set_periods( sndh, hw_params, 8, 0 );
 	snd_pcm_hw_params_set_buffer_size( sndh, hw_params, (1024 * 8) / 2 );
@@ -39,16 +39,17 @@ void sound_alsa_flush()
 {
     int res;
     unsigned long towr = bufferFrames;
-    signed short *sndb = sound_buffer;
+    SNDFRAME *sndb = sound_buffer;
 
     while ( towr )
     {
-        if ( ( res = snd_pcm_writei( sndh, sndb, towr ) ) < 0 );
+        if ( ( res = snd_pcm_writei( sndh, sndb, towr ) ) < 0 )
         {
             snd_pcm_prepare( sndh );
             continue;
         }
         towr -= res;
+        sndb += res*2;
     }
 
     memset( sound_buffer, 0, bufferFrames * sizeof( SNDFRAME ) );

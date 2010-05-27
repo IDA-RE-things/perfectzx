@@ -4,7 +4,7 @@
 
 static unsigned long last_tstate;
 
-double volume_ay = 2500.0;
+double volume_ay = 5000.0;
 
 const double dac_val[16]=
 {
@@ -125,9 +125,9 @@ static void process_ay( unsigned long tstate )
     while ( tstate > last_tstate )
     {
         ay_tick( &ay );
-        add_sound( last_tstate, last_tstate + 16, zxcpu_tstates_frame, (dac_val[ay.sound[0]] +
-                                                                        dac_val[ay.sound[1]] +
-                                                                        dac_val[ay.sound[2]]) * volume_ay );
+        add_sound( last_tstate, last_tstate + 16, zxcpu_tstates_frame,
+                   ( dac_val[ay.sound[0]] + dac_val[ay.sound[1]]/2 ) * volume_ay,
+                   ( dac_val[ay.sound[2]] + dac_val[ay.sound[1]]/2 ) * volume_ay );
         last_tstate += 16;
     }
 }
@@ -140,7 +140,7 @@ static void reset()
 
 static void frame()
 {
-    process_ay( zxcpu_tstates );
+    process_ay( zxcpu_tstates_frame );
     last_tstate = 0;
 }
 

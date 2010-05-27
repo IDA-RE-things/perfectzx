@@ -8,7 +8,7 @@
 	"video.h"
 	"input.h"
 
-1274855537 /home/las/programming/perfectzx/emul.h
+1274943589 /home/las/programming/perfectzx/emul.h
 	"z80ex.h"
 
 1252764880 /home/las/programming/perfectzx/z80ex-1.1.18/include/z80ex.h
@@ -1977,12 +1977,12 @@
 1271058059 /usr/include/gtk-2.0/gtk/gtktipsquery.h
 	<gtk/gtk.h>
 
-1274877915 source:/home/las/programming/perfectzx/devices/sinclair128.c
+1274957331 source:/home/las/programming/perfectzx/devices/sinclair128.c
 	"../main.h"
 	"../devices.h"
 	"../sound.h"
 
-1274860651 source:/home/las/programming/perfectzx/emul.c
+1274956968 source:/home/las/programming/perfectzx/emul.c
 	"main.h"
 	"z80ex.h"
 	"emul.h"
@@ -2139,7 +2139,7 @@
 
 1274443948 /home/las/programming/perfectzx/sound_oss.h
 
-1274447496 source:/home/las/programming/perfectzx/sound_oss.c
+1274956951 source:/home/las/programming/perfectzx/sound_oss.c
 	<stdio.h>
 	<fcntl.h>
 	<unistd.h>
@@ -2148,21 +2148,30 @@
 	<string.h>
 	"sound.h"
 
-1274876343 source:/home/las/programming/perfectzx/devices/psg.c
+1274956186 source:/home/las/programming/perfectzx/devices/psg.c
 	"../main.h"
 	"../devices.h"
 	"../sound.h"
 
-1274872483 source:/home/las/programming/perfectzx/sound.c
+1274956951 source:/home/las/programming/perfectzx/sound.c
 	"sound.h"
 
-1274855960 /home/las/programming/perfectzx/sound.h
+1274956951 /home/las/programming/perfectzx/sound.h
 
-1274855806 source:/home/las/programming/perfectzx/sound_alsa.c
+1274956815 source:/home/las/programming/perfectzx/sound_alsa.c
 	<stdio.h>
 	<alsa/asoundlib.h>
 	"sound.h"
 
 1252765096 /home/las/programming/perfectzx/z80ex-1.1.18/typedefs.h
 	"z80ex.h"
+
+1244507225 /home/las/programming/perfectzx/z80ex-1.1.18/include/z80ex_dasm.h
+	"z80ex_common.h"
+
+1274943589 source:/home/las/programming/perfectzx/debug.c
+	"debug.h"
+
+1274943577 /home/las/programming/perfectzx/debug.h
+	"z80ex_dasm.h"
 

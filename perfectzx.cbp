@@ -44,17 +44,23 @@
 			<Add option="-Wall" />
 			<Add option="`pkg-config gtk+-2.0 --cflags`" />
 			<Add option="-pthread" />
+			<Add option="-DHGVERSION=`hg parents --template &apos;{rev}&apos;`" />
 			<Add directory="z80ex-1.1.18/include" />
 		</Compiler>
 		<Linker>
 			<Add option="`pkg-config gtk+-2.0 --libs`" />
 			<Add option="-pthread" />
 			<Add library="z80ex" />
+			<Add library="z80ex_dasm" />
 			<Add library="gthread-2.0" />
 			<Add library="rt" />
 			<Add library="asound" />
 			<Add directory="z80ex-1.1.18/lib" />
 		</Linker>
+		<Unit filename="debug.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="debug.h" />
 		<Unit filename="devices.h" />
 		<Unit filename="devices/psg.c">
 			<Option compilerVar="CC" />

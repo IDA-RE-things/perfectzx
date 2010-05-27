@@ -21,7 +21,7 @@ void sound_oss_init()
     tmp = AFMT_S16_NE;
     ioctl( dspf, SNDCTL_DSP_SETFMT, &tmp );
 
-    tmp = 1;
+    tmp = 2;
     ioctl( dspf, SNDCTL_DSP_CHANNELS, &tmp );
 
     tmp = 48000;
@@ -40,14 +40,19 @@ void sound_oss_uninit()
 
 void sound_oss_flush()
 {
+    int res;
     unsigned long towr = bufferFrames * sizeof( SNDFRAME );
-    signed short *sndb = sound_buffer;
+    SNDFRAME *sndb = sound_buffer;
 
     if ( dspf == -1 )
         return;
 
     while ( towr )
-        towr -= write( dspf, sndb, towr );
+    {
+        res = write( dspf, sndb, towr );
+        towr -= res;
+        sndb += res;
+    }
 
     memset( sound_buffer, 0, bufferFrames * sizeof( SNDFRAME ) );
 }

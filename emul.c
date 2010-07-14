@@ -57,15 +57,15 @@ void emul_stop()
 void emul_init()
 {
 	printf( "PerfectZX - ZX Spectrum emulator\n" );
-	printf( "Version %s (revision %d) by Molodtsov Alex\n", emul_version, HGVERSION + 1 );
+	printf( "Version %s (revision %d) by Molodtsov Alex\n", emul_version, HGVERSION );
 
 	Z80EX_VERSION *ver_z80ex;
 	ver_z80ex = z80ex_get_version();
 	printf("Using Z80ex version %s\n\n", ver_z80ex->as_string);
 
-	/*sync_wait = timer_sync;
+	sync_wait = timer_sync;
 	sync_start = timer_start;
-	sync_stop = timer_stop;*/
+	sync_stop = timer_stop;
 	sync_wait = sound_oss_flush;
 	sync_start = sound_oss_init;
 	sync_stop = sound_oss_uninit;

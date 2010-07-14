@@ -12,9 +12,10 @@ SNDFRAME;
 extern SNDFRAME sound_buffer[480 * 2];
 extern unsigned long bufferFrames;
 
-void (*add_sound)( unsigned begin, unsigned end, unsigned measures, double l, double r );
-void add_sound_f( unsigned begin, unsigned end, unsigned measures, double l, double r );
-void add_sound_nf( unsigned begin, unsigned end, unsigned measures, double l, double r );
+void (*add_sound)( unsigned begin, unsigned end, unsigned measures, signed l, signed r );
+void add_sound_fi( unsigned begin, unsigned end, unsigned measures, signed l, signed r );
+void add_sound_ff( unsigned begin, unsigned end, unsigned measures, signed l, signed r );
+void add_sound_nf( unsigned begin, unsigned end, unsigned measures, signed l, signed r );
 
 void sound_oss_init();
 void sound_oss_uninit();

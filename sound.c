@@ -4,11 +4,39 @@
 SNDFRAME sound_buffer[480 * 2];
 unsigned long bufferFrames = 480 * 2;
 
-void add_sound_null( unsigned begin, unsigned end, unsigned measures, double l, double r )
+void add_sound_null( unsigned begin, unsigned end, unsigned measures, signed l, signed r )
 {
 }
 
-void add_sound_f( unsigned begin, unsigned end, unsigned measures, double l, double r )
+void add_sound_fi( unsigned begin, unsigned end, unsigned measures, signed l, signed r )
+{
+    unsigned cur_fr, next_fr, fr_len, cur_len;
+
+    cur_fr = begin * bufferFrames / measures;
+
+    do
+    {
+        next_fr = ( cur_fr + 1 ) * measures / bufferFrames;
+        fr_len = next_fr - cur_fr * measures / bufferFrames;
+
+        if ( next_fr > end )
+            next_fr = end;
+
+        if ( next_fr == begin )
+            break;
+
+        cur_len = next_fr - begin;
+
+        sound_buffer[cur_fr].l += l * cur_len / fr_len;
+		sound_buffer[cur_fr].r += r * cur_len / fr_len;
+
+        begin = next_fr;
+        cur_fr ++;
+    }
+    while ( next_fr < end );
+}
+
+void add_sound_ff( unsigned begin, unsigned end, unsigned measures, signed l, signed r )
 {
 	unsigned st_fr, end_fr;
 	double st_off, end_off;
@@ -40,7 +68,7 @@ void add_sound_f( unsigned begin, unsigned end, unsigned measures, double l, dou
 	}
 }
 
-void add_sound_nf( unsigned begin, unsigned end, unsigned measures, double l, double r )
+void add_sound_nf( unsigned begin, unsigned end, unsigned measures, signed l, signed r )
 {
     unsigned long i;
     unsigned long end_fr = ( end * bufferFrames ) / measures;
@@ -52,4 +80,4 @@ void add_sound_nf( unsigned begin, unsigned end, unsigned measures, double l, do
     }
 }
 
-void (*add_sound)( unsigned begin, unsigned end, unsigned measures, double l, double r ) = add_sound_nf;
+void (*add_sound)( unsigned begin, unsigned end, unsigned measures, signed l, signed r ) = add_sound_fi;

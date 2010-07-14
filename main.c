@@ -65,7 +65,7 @@ int main( int argc, char *argv[] )
     gtk_container_set_border_width(GTK_CONTAINER(main_win), 8);
     gtk_window_set_title(GTK_WINDOW(main_win), "PerfectZX");
     gtk_window_set_position(GTK_WINDOW(main_win), GTK_WIN_POS_CENTER);
-    main_win_icon = gdk_pixbuf_new_from_file("icon.png", NULL);
+    main_win_icon = gdk_pixbuf_new_from_file("icon.svg", NULL);
     gtk_window_set_icon(GTK_WINDOW(main_win), main_win_icon);
 
     gtk_widget_realize(main_win);

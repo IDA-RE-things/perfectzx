@@ -12,7 +12,7 @@ Z80EX_BYTE p7FFD_state;
 
 int beeper_st;
 unsigned long beeper_last_tstate;
-double volume_beep = 5000.0;
+signed volume_beep = 5000.0;
 
 static void reset()
 {
@@ -116,8 +116,8 @@ void load_sna(char *flname, Z80EX_CONTEXT *cpu )
             fread( &tmp, 2, 1, snafile ); z80ex_set_reg( cpu, regIY, tmp );
             fread( &tmp, 2, 1, snafile ); z80ex_set_reg( cpu, regIX, tmp );
             fread( &tmp, 1, 1, snafile );
-            z80ex_set_reg( cpu, regIFF1, (tmp >> 1) & 1 );
-            z80ex_set_reg( cpu, regIFF2, (tmp >> 2) & 1 );
+            z80ex_set_reg( cpu, regIFF1, (tmp >> 2) & 1 );
+            z80ex_set_reg( cpu, regIFF2, (tmp >> 1) & 1 );
             fread( &tmp, 1, 1, snafile ); z80ex_set_reg( cpu, regR, tmp );
             fread( &tmp, 2, 1, snafile ); z80ex_set_reg( cpu, regAF, tmp );
             fread( &tmp, 2, 1, snafile ); z80ex_set_reg( cpu, regSP, tmp );
@@ -132,16 +132,18 @@ void load_sna(char *flname, Z80EX_CONTEXT *cpu )
             p7FFD_state = 0;
             if ( snasize > 0xC01B )  // this is extention to 128k sna
             {
+                unsigned char p7FFD;
                 fread( &tmp, 2, 1, snafile ); z80ex_set_reg( cpu, regPC, tmp );
-                port_out( cpu, 0x7FFD, fgetc(snafile) );
+                p7FFD = fgetc(snafile);
 
                 fgetc(snafile);
-                if ( ( p7FFD_state & 0x7 ) != 0 )
-                    memcpy( RAM_PAGE(p7FFD_state & 0x7), RAM_PAGE(0), 0x4000 );
+                if ( ( p7FFD & 0x7 ) != 0 )
+                    memcpy( RAM_PAGE(p7FFD & 0x7), RAM_PAGE(0), 0x4000 );
                 unsigned p;
                 for ( p = 0; p < 8; p ++ )
-                    if ( ( p != 2 ) && ( p != 5 ) && ( p != ( p7FFD_state & 0x7 ) ) )
+                    if ( ( p != 2 ) && ( p != 5 ) && ( p != ( p7FFD & 0x7 ) ) )
                         fread( RAM_PAGE(p), 0x4000, 1, snafile );
+                port_out( cpu, 0x7FFD, p7FFD );
             }
             else
             {
@@ -179,14 +181,15 @@ static void init()
 	mem_map[2] = RAM_PAGE(2);
 	mem_map[3] = RAM_PAGE(0);
 
+	video_memory = RAM_PAGE(5);
+	video_border = 0x00;
+
 	FILE *romf;
 	romf = fopen("128.rom", "rb");
 	res = fread(mem_rom, 0x4000, 2, romf);
 	fclose(romf);
-	load_sna( "Snapshots/shock.sna", zxcpu );
 
-	video_memory = RAM_PAGE(5);
-	video_border = 0x00;
+	load_sna( "Snapshots/sat3.sna", zxcpu );
 }
 
 static void uninit()

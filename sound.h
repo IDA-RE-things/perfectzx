@@ -9,10 +9,16 @@ typedef struct
 }
 SNDFRAME;
 
-extern SNDFRAME sound_buffer[480 * 2];
+#define SNDFRAME_LEN    20
+
+extern SNDFRAME *sound_buffer;
 extern unsigned long bufferFrames;
 
-void (*add_sound)( unsigned begin, unsigned end, unsigned measures, signed l, signed r );
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern void (*add_sound)( unsigned begin, unsigned end, unsigned measures, signed l, signed r );
 void add_sound_fi( unsigned begin, unsigned end, unsigned measures, signed l, signed r );
 void add_sound_ff( unsigned begin, unsigned end, unsigned measures, signed l, signed r );
 void add_sound_nf( unsigned begin, unsigned end, unsigned measures, signed l, signed r );
@@ -24,5 +30,13 @@ void sound_oss_flush();
 void sound_alsa_init();
 void sound_alsa_uninit();
 void sound_alsa_flush();
+
+void sound_pulse_init();
+void sound_pulse_uninit();
+void sound_pulse_flush();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // PZX_SOUND

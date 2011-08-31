@@ -46,6 +46,7 @@
 			<Add option="-pthread" />
 			<Add option="-DHGVERSION=`hg parents --template &apos;{rev}&apos;`" />
 			<Add directory="z80ex-1.1.18/include" />
+			<Add directory="resid-0.16" />
 		</Compiler>
 		<Linker>
 			<Add option="`pkg-config gtk+-2.0 --libs`" />
@@ -55,16 +56,30 @@
 			<Add library="gthread-2.0" />
 			<Add library="rt" />
 			<Add library="asound" />
+			<Add library="resid" />
+			<Add library="pulse" />
+			<Add library="pulse-simple" />
 			<Add directory="z80ex-1.1.18/lib" />
+			<Add directory="resid-0.16/.libs" />
 		</Linker>
 		<Unit filename="debug.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="debug.h" />
 		<Unit filename="devices.h" />
+		<Unit filename="devices/gmx.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="devices/kempston_mouse.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="devices/megapsg.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="devices/psg.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="devices/sid.cpp" />
 		<Unit filename="devices/sinclair128.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -85,6 +100,9 @@
 			<Option weight="0" />
 		</Unit>
 		<Unit filename="main.h" />
+		<Unit filename="os_unix/files.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="sound.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -93,6 +111,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="sound_oss.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sound_pulse.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="sync_timer.c">
@@ -107,6 +128,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="video.h" />
+		<Unit filename="wd1793.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="wd1793.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />

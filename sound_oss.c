@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <sys/ioctl.h>
 #include <sys/soundcard.h>
 #include <string.h>
@@ -12,7 +13,7 @@ int dspf;
 
 void sound_oss_init()
 {
-    unsigned tmp;
+    unsigned tmp, rate;
 
     dspf = open( "/dev/dsp", O_WRONLY );
     if ( dspf == -1 )
@@ -24,18 +25,23 @@ void sound_oss_init()
     tmp = 2;
     ioctl( dspf, SNDCTL_DSP_CHANNELS, &tmp );
 
-    tmp = 48000;
-    ioctl( dspf, SNDCTL_DSP_SPEED, &tmp );
+    rate = 48000;
+    ioctl( dspf, SNDCTL_DSP_SPEED, &rate );
 
     // set latency
     tmp = ( 4 << 16 ) | 10;
     ioctl( dspf, SNDCTL_DSP_SETFRAGMENT, &tmp );
+
+    bufferFrames = SNDFRAME_LEN * rate / 1000;
+	sound_buffer = calloc( bufferFrames, sizeof(SNDFRAME) );
 }
 
 void sound_oss_uninit()
 {
     if ( dspf != -1 )
         close( dspf );
+
+    free( sound_buffer );
 }
 
 void sound_oss_flush()

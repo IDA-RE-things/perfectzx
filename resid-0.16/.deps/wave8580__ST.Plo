@@ -1,0 +1,5 @@
+wave8580__ST.lo: wave8580__ST.cc wave.h siddefs.h
+
+wave.h:
+
+siddefs.h:

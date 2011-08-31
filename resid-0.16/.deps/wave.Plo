@@ -1,0 +1,5 @@
+wave.lo: wave.cc wave.h siddefs.h
+
+wave.h:
+
+siddefs.h:

@@ -4,9 +4,9 @@
 
 static unsigned long last_tstate;
 
-signed volume_ay = 7500.0;
+static signed volume_ay = 10000;
 
-const double dac_val[16]=
+static const double dac_val[16]=
 {
 	0.0000,
 	0.0102,
@@ -49,6 +49,8 @@ static struct ay_t
 	unsigned char noise_signal;
 
 	unsigned char sound[3];
+	unsigned char last_sound[3];
+	unsigned long last_tstate;
 } ay;
 
 static void ay_tick( struct ay_t *ay )
@@ -122,10 +124,15 @@ static void process_ay( unsigned long tstate )
     while ( tstate > last_tstate )
     {
         ay_tick( &ay );
-        add_sound( last_tstate, last_tstate + 16, zxcpu_tstates_frame,
-                   ( dac_val[ay.sound[0]] + dac_val[ay.sound[1]]/2 ) * volume_ay,
-                   ( dac_val[ay.sound[2]] + dac_val[ay.sound[1]]/2 ) * volume_ay );
         last_tstate += 16;
+        if ( memcmp( ay.sound, ay.last_sound, sizeof(ay.sound) ) || last_tstate >= zxcpu_tstates_frame )
+        {
+            add_sound( ay.last_tstate, last_tstate, zxcpu_tstates_frame,
+                       ( dac_val[ay.last_sound[0]] + dac_val[ay.last_sound[1]]*0.7 + dac_val[ay.last_sound[2]]*0.2 ) * volume_ay,
+                       ( dac_val[ay.last_sound[2]] + dac_val[ay.last_sound[1]]*0.7 + dac_val[ay.last_sound[0]]*0.2 ) * volume_ay );
+            ay.last_tstate = last_tstate;
+            memcpy( ay.last_sound, ay.sound, sizeof(ay.sound) );
+        }
     }
 }
 
@@ -139,43 +146,42 @@ static void frame()
 {
     process_ay( zxcpu_tstates_frame );
     last_tstate = 0;
+    ay.last_tstate = 0;
 }
 
 static int port_out(Z80EX_CONTEXT *cpu, Z80EX_WORD port, Z80EX_BYTE value)
 {
     PORT_TEST(0xFFFD, 0xC002)
     {
-        ay.reg_latch = value;
+        if ( value < 16 )
+            ay.reg_latch = value;
     }
     PORT_TEST(0xBFFD, 0xC002)
     {
-        if ( ay.reg_latch < 16 )
+        process_ay( zxcpu_tstates );
+
+        switch ( ay.reg_latch )
         {
-            process_ay( zxcpu_tstates );
+            case 0x0: ay.tone_period[0] = ( ay.tone_period[0] & 0xFF00 ) | ( value << 0 ); break;
+            case 0x1: ay.tone_period[0] = ( ay.tone_period[0] & 0x00FF ) | ( value << 8 ); break;
+            case 0x2: ay.tone_period[1] = ( ay.tone_period[1] & 0xFF00 ) | ( value << 0 ); break;
+            case 0x3: ay.tone_period[1] = ( ay.tone_period[1] & 0x00FF ) | ( value << 8 ); break;
+            case 0x4: ay.tone_period[2] = ( ay.tone_period[2] & 0xFF00 ) | ( value << 0 ); break;
+            case 0x5: ay.tone_period[2] = ( ay.tone_period[2] & 0x00FF ) | ( value << 8 ); break;
 
-            switch ( ay.reg_latch )
-            {
-                case 0x0: ay.tone_period[0] = ( ay.tone_period[0] & 0xFF00 ) | ( value << 0 ); break;
-                case 0x1: ay.tone_period[0] = ( ay.tone_period[0] & 0x00FF ) | ( value << 8 ); break;
-                case 0x2: ay.tone_period[1] = ( ay.tone_period[1] & 0xFF00 ) | ( value << 0 ); break;
-                case 0x3: ay.tone_period[1] = ( ay.tone_period[1] & 0x00FF ) | ( value << 8 ); break;
-                case 0x4: ay.tone_period[2] = ( ay.tone_period[2] & 0xFF00 ) | ( value << 0 ); break;
-                case 0x5: ay.tone_period[2] = ( ay.tone_period[2] & 0x00FF ) | ( value << 8 ); break;
+            case 0x6: ay.noise_period = value; break;
 
-                case 0x6: ay.noise_period = value; break;
+            case 0x7: ay.control = value; break;
+            case 0x8: ay.channel_vol[0] = value; break;
+            case 0x9: ay.channel_vol[1] = value; break;
+            case 0xA: ay.channel_vol[2] = value; break;
 
-                case 0x7: ay.control = value; break;
-                case 0x8: ay.channel_vol[0] = value; break;
-                case 0x9: ay.channel_vol[1] = value; break;
-                case 0xA: ay.channel_vol[2] = value; break;
-
-                case 0xB: ay.envelope_period = ( ay.envelope_period & 0xFF00 ) | ( value << 0 ); break;
-                case 0xC: ay.envelope_period = ( ay.envelope_period & 0x00FF ) | ( value << 8 ); break;
-                case 0xD: ay.envelope_shape = value;
+            case 0xB: ay.envelope_period = ( ay.envelope_period & 0xFF00 ) | ( value << 0 ); break;
+            case 0xC: ay.envelope_period = ( ay.envelope_period & 0x00FF ) | ( value << 8 ); break;
+            case 0xD: ay.envelope_shape = value;
                     ay.envelope_phase = 0;
                     ay.envelope_state = ( ( ay.envelope_shape & 4 ) ? 0x0 : 0xF );
                     break;
-            }
         }
     }
 
@@ -186,27 +192,26 @@ static int port_in(Z80EX_CONTEXT *cpu, Z80EX_WORD port, Z80EX_BYTE *value)
 {
     PORT_TEST(0xFFFD, 0xC002)
     {
-        if ( ay.reg_latch < 16 )
-            switch ( ay.reg_latch )
-            {
-                case 0x0: *value = ay.tone_period[0] >> 0; break;
-                case 0x1: *value = ay.tone_period[0] >> 8; break;
-                case 0x2: *value = ay.tone_period[1] >> 0; break;
-                case 0x3: *value = ay.tone_period[1] >> 8; break;
-                case 0x4: *value = ay.tone_period[2] >> 0; break;
-                case 0x5: *value = ay.tone_period[2] >> 8; break;
+        switch ( ay.reg_latch )
+        {
+            case 0x0: *value = ay.tone_period[0] >> 0; break;
+            case 0x1: *value = ay.tone_period[0] >> 8; break;
+            case 0x2: *value = ay.tone_period[1] >> 0; break;
+            case 0x3: *value = ay.tone_period[1] >> 8; break;
+            case 0x4: *value = ay.tone_period[2] >> 0; break;
+            case 0x5: *value = ay.tone_period[2] >> 8; break;
 
-                case 0x6: *value = ay.noise_period; break;
+            case 0x6: *value = ay.noise_period; break;
 
-                case 0x7: *value = ay.control; break;
-                case 0x8: *value = ay.channel_vol[0]; break;
-                case 0x9: *value = ay.channel_vol[1]; break;
-                case 0xA: *value = ay.channel_vol[2]; break;
+            case 0x7: *value = ay.control; break;
+            case 0x8: *value = ay.channel_vol[0]; break;
+            case 0x9: *value = ay.channel_vol[1]; break;
+            case 0xA: *value = ay.channel_vol[2]; break;
 
-                case 0xB: *value = ay.envelope_period >> 0; break;
-                case 0xC: *value = ay.envelope_period >> 8; break;
-                case 0xD: *value = ay.envelope_shape; break;
-            }
+            case 0xB: *value = ay.envelope_period >> 0; break;
+            case 0xC: *value = ay.envelope_period >> 8; break;
+            case 0xD: *value = ay.envelope_shape; break;
+        }
     }
 
     return 0;
@@ -215,6 +220,8 @@ static int port_in(Z80EX_CONTEXT *cpu, Z80EX_WORD port, Z80EX_BYTE *value)
 static void init()
 {
 	last_tstate = 0;
+	ay.last_tstate = 0;
+	memset( ay.last_sound, 0, sizeof(ay.last_sound) );
 }
 
 static void uninit()

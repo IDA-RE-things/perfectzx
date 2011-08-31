@@ -147,7 +147,9 @@ void video_render_std(unsigned long tstate)
                             pattern ^= 0xFF;
                         unsigned i;
                         for (i = 0; i < 8; i++)
+                        {
                             vid_buffer_out[out_x++ + out_y*320] = video_palette[(pattern&(1<<(7-i)))? std_ink[attribute]:std_paper[attribute]];
+                        }
                         video_last_tstate += 4;
                     }
                 }
@@ -155,7 +157,7 @@ void video_render_std(unsigned long tstate)
                 else
                 {
                     unsigned long border_end;
-                    border_end = (line >= 48 && line < (48+192) && line_x < (32+128))? (line*224+32) : ((line+1)*224);
+                    border_end = (line >= 48 && line < (48+192) && line_x < (32+128))? (line*224+32) : ((line*224)+32+128+16);//((line+1)*224);
                     border_end = (tstate < border_end) ? tstate : border_end;
                     for(;video_last_tstate < border_end; video_last_tstate++)
                     {

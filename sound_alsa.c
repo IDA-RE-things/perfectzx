@@ -7,10 +7,17 @@ static snd_pcm_t *sndh;
 
 void sound_alsa_init()
 {
+    int ret;
     snd_pcm_hw_params_t *hw_params;
     unsigned rate = 48000;
 
-    snd_pcm_open( &sndh, "hw:0,0", SND_PCM_STREAM_PLAYBACK, 0 );
+    ret = snd_pcm_open( &sndh, "hw:0,0", SND_PCM_STREAM_PLAYBACK, 0 );
+    if ( ret < 0 )
+    {
+    	fprintf (stderr, "cannot open audio device (%s)\n",
+				 snd_strerror (ret));
+        return;
+    }
 
     snd_pcm_hw_params_malloc( &hw_params );
     snd_pcm_hw_params_any( sndh, hw_params );
@@ -20,19 +27,22 @@ void sound_alsa_init()
     snd_pcm_hw_params_set_rate_near( sndh, hw_params, &rate, 0 );
 	snd_pcm_hw_params_set_channels( sndh, hw_params, 2 );
 
+	bufferFrames = SNDFRAME_LEN * rate / 1000;
+	sound_buffer = calloc( bufferFrames, sizeof(SNDFRAME) );
+
 	snd_pcm_hw_params_set_periods( sndh, hw_params, 8, 0 );
 	snd_pcm_hw_params_set_buffer_size( sndh, hw_params, (1024 * 8) / 2 );
 
 	snd_pcm_hw_params( sndh, hw_params );
 
 	snd_pcm_hw_params_free( hw_params );
-
 	snd_pcm_prepare( sndh );
 }
 
 void sound_alsa_uninit()
 {
     snd_pcm_close( sndh );
+    free( sound_buffer );
 }
 
 void sound_alsa_flush()

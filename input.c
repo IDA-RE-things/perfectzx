@@ -13,6 +13,7 @@ ZXKEYBIND *zxkey_bind = NULL;
 unsigned zxkey_bind_count = 0;
 
 volatile unsigned char zxkey_matrix[8];
+volatile unsigned zxmouse_x, zxmouse_y, zxmouse_but;
 
 void input_add_zxkey_bind(const char *key_code, const char *zxkey)
 {
@@ -37,7 +38,7 @@ void input_delete_zxkey_bindings()
     zxkey_bind_count = 0;
 }
 
-void input_event_keyboard(unsigned short key, int pressed)
+int input_event_keyboard(unsigned short key, int pressed)
 {
     unsigned i;
     for ( i = 0; i < zxkey_bind_count; i ++ )
@@ -52,6 +53,8 @@ void input_event_keyboard(unsigned short key, int pressed)
 
             break;
         }
+
+    return ( 1 );
 }
 
 void input_init()

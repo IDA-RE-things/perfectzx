@@ -13,6 +13,12 @@ const char emul_version[] = "N/A (sekrit development version)";
 void (*sync_wait)(void);
 void (*sync_start)(void);
 void (*sync_stop)(void);
+void (*sync_init)(void);
+void (*sync_uninit)(void);
+
+void sync_dumb()
+{
+}
 
 int emul_running;
 #ifdef  WINDOWS
@@ -66,12 +72,26 @@ void emul_init()
 	sync_wait = timer_sync;
 	sync_start = timer_start;
 	sync_stop = timer_stop;
-	sync_wait = sound_oss_flush;
-	sync_start = sound_oss_init;
-	sync_stop = sound_oss_uninit;
-	sync_wait = sound_alsa_flush;
-	sync_start = sound_alsa_init;
-	sync_stop = sound_alsa_uninit;
+	sync_init = sync_dumb;
+	sync_uninit = sync_dumb;
+
+	sync_wait   = sound_oss_flush;
+	sync_start  = sync_dumb;
+	sync_stop   = sync_dumb;
+	sync_init   = sound_oss_init;
+	sync_uninit = sound_oss_uninit;
+
+	sync_wait   = sound_alsa_flush;
+	sync_start  = sync_dumb;
+	sync_stop   = sync_dumb;
+	sync_init   = sound_alsa_init;
+	sync_uninit = sound_alsa_uninit;
+
+	sync_wait   = sound_pulse_flush;
+	sync_start  = sync_dumb;
+	sync_stop   = sync_dumb;
+	sync_init   = sound_pulse_init;
+	sync_uninit = sound_pulse_uninit;
 
     printf("Initializing video...\n");
     video_init();
@@ -79,6 +99,8 @@ void emul_init()
     input_init();
     printf("Initializing emulator...\n");
     zx_init();
+    printf("Initializing synchronizator...\n");
+    sync_init();
 
     printf("\nStart!\n");
     emul_start();
@@ -89,6 +111,7 @@ void emul_uninit()
     emul_stop();
     printf("Stop!\n");
 
+    sync_uninit();
     zx_uninit();
     input_uninit();
     video_uninit();

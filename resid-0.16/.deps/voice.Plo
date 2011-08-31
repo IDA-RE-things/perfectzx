@@ -1,0 +1,9 @@
+voice.lo: voice.cc voice.h siddefs.h wave.h envelope.h
+
+voice.h:
+
+siddefs.h:
+
+wave.h:
+
+envelope.h:

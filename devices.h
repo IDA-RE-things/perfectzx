@@ -43,10 +43,10 @@ typedef struct
 	void (*reset)();
 	void (*frame)();
 	//void (*tstate)( unsigned long tstate );
-	int (*mem_read)( Z80EX_CONTEXT *cpu, Z80EX_WORD addr, Z80EX_BYTE *value );
+	int (*mem_read)( Z80EX_CONTEXT *cpu, Z80EX_WORD addr, Z80EX_BYTE *value, int m1_state );
 	int (*mem_write)( Z80EX_CONTEXT *cpu, Z80EX_WORD addr, Z80EX_BYTE value );
 
-	VAR_LINK *link;
+	file_fiter_t *files_open;
 } SDevice;
 
 typedef struct
@@ -57,6 +57,10 @@ typedef struct
 
 extern unsigned long zxcpu_tstates_frame;
 extern SDevice zxdevice_sinclair128;
+extern SDevice zxdevice_gmx;
 extern SDevice zxdevice_ay;
+extern SDevice zxdevice_megaay;
+extern SDevice zxdevice_sid;
+extern SDevice zxdevice_kempston_mouse;
 
 #endif

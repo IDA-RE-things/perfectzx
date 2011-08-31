@@ -6,6 +6,7 @@ syntax: glob
 *.o
 gmon*
 *.layout
+*.depend
 bin/
 obj/
 Snapshots/

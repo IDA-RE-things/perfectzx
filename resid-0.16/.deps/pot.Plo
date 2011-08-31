@@ -1,0 +1,5 @@
+pot.lo: pot.cc pot.h siddefs.h
+
+pot.h:
+
+siddefs.h:

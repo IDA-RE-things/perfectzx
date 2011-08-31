@@ -1,0 +1,5 @@
+wave6581_P_T.lo: wave6581_P_T.cc wave.h siddefs.h
+
+wave.h:
+
+siddefs.h:

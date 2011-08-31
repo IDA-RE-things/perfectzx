@@ -1,0 +1,5 @@
+wave6581_PST.lo: wave6581_PST.cc wave.h siddefs.h
+
+wave.h:
+
+siddefs.h:

@@ -43,6 +43,8 @@ void zx_create_machine(SDevice **config, unsigned dev_count)
     free(zx_device);
     zx_device = new_machine;
     zx_device_count = dev_count;
+
+    init_fopen( zx_device );
 }
 
 void zx_destroy_machine()
@@ -53,13 +55,30 @@ void zx_destroy_machine()
 }
 
 // cpu callback procedures
+void zxcpu_tstate( Z80EX_CONTEXT *cpu, void *user_data )
+{
+    unsigned dev;
+
+    if ( ++ zxcpu_tstates >= zxcpu_tstates_frame )
+    {
+        // frame done
+        device_scan_asc(frame)
+            zx_device[dev]->frame();
+
+        video_update();
+        sync_wait();
+
+        zxcpu_tstates = 0;
+    }
+}
+
 Z80EX_BYTE zxcpu_memread(Z80EX_CONTEXT *cpu, Z80EX_WORD addr, int m1_state, void *user_data)
 {
     static Z80EX_BYTE value;
     unsigned dev;
     value = 0xFF;	// data bits pulled up to +5V
     device_scan_desc(mem_read)
-        if (zx_device[dev]->mem_read(cpu, addr, &value)) break;
+        if (zx_device[dev]->mem_read(cpu, addr, &value, m1_state )) break;
     return value;
 }
 
@@ -103,25 +122,11 @@ Z80EX_BYTE zxcpu_intread(Z80EX_CONTEXT *cpu, void *user_data)
 // main cycle
 void zx_life( int *running )
 {
-    unsigned dev;
-
     while ( *running )
     {
-        while ( zxcpu_tstates < zxcpu_tstates_frame )
-        {
-            if ((zxcpu_tstates >= zxcpu_int_start) && (zxcpu_tstates < zxcpu_int_end))
-                zxcpu_tstates += z80ex_int(zxcpu);
-            zxcpu_tstates += z80ex_step(zxcpu);
-        }
-
-        // frame done
-        device_scan_asc(frame)
-            zx_device[dev]->frame();
-
-        video_update();
-        sync_wait();
-
-        zxcpu_tstates %= zxcpu_tstates_frame;
+        if ((zxcpu_tstates >= zxcpu_int_start) && (zxcpu_tstates < zxcpu_int_end))
+            z80ex_int(zxcpu);
+        z80ex_step(zxcpu);
     }
 }
 
@@ -142,7 +147,7 @@ void zx_init()
         zxcpu_portread, NULL,
         zxcpu_portwrite, NULL,
         zxcpu_intread, NULL);
-    // z80ex_set_tstate_callback(zxcpu, zxcpu_tstate, NULL);
+    z80ex_set_tstate_callback(zxcpu, zxcpu_tstate, NULL);
 
     // init device mechanism
     zx_device_count = 0;
@@ -151,7 +156,11 @@ void zx_init()
     // construct machine
     SDevice *zxtest[] = {
             &zxdevice_sinclair128,
+            //&zxdevice_gmx,
+            //&zxdevice_sid,
             &zxdevice_ay,
+            //&zxdevice_megaay,
+            &zxdevice_kempston_mouse,
     };
     zx_create_machine(zxtest, sizeof(zxtest) / sizeof(SDevice*));
 }

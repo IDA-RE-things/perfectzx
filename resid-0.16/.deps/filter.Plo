@@ -1,0 +1,7 @@
+filter.lo: filter.cc filter.h siddefs.h spline.h
+
+filter.h:
+
+siddefs.h:
+
+spline.h:

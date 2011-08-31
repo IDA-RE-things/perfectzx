@@ -1,8 +1,8 @@
-//#include <stdio.h>
+#include <stdio.h>
 #include "sound.h"
 
-SNDFRAME sound_buffer[480 * 2];
-unsigned long bufferFrames = 480 * 2;
+SNDFRAME *sound_buffer;
+unsigned long bufferFrames;
 
 void add_sound_null( unsigned begin, unsigned end, unsigned measures, signed l, signed r )
 {
@@ -11,6 +11,9 @@ void add_sound_null( unsigned begin, unsigned end, unsigned measures, signed l, 
 void add_sound_fi( unsigned begin, unsigned end, unsigned measures, signed l, signed r )
 {
     unsigned cur_fr, next_fr, fr_len, cur_len;
+
+    if ( !l && !r ) // if nothing to do
+        return;     // leave, don't waste time on useless calculations
 
     cur_fr = begin * bufferFrames / measures;
 
@@ -22,13 +25,18 @@ void add_sound_fi( unsigned begin, unsigned end, unsigned measures, signed l, si
         if ( next_fr > end )
             next_fr = end;
 
-        if ( next_fr == begin )
-            break;
+        if ( !fr_len )//next_fr == begin )
+        {
+            cur_fr ++;
+            continue;
+        }
 
         cur_len = next_fr - begin;
 
-        sound_buffer[cur_fr].l += l * cur_len / fr_len;
-		sound_buffer[cur_fr].r += r * cur_len / fr_len;
+        if ( l )
+            sound_buffer[cur_fr].l += l * cur_len / fr_len;
+        if ( r )
+            sound_buffer[cur_fr].r += r * cur_len / fr_len;
 
         begin = next_fr;
         cur_fr ++;

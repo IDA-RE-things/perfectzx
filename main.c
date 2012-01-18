@@ -212,7 +212,7 @@ void init_fopen( SDevice **config )
     /* get total count of filters */
     filter_count = 0;
     for (dev = 0; dev < zx_device_count; dev++)
-        if (config[dev]->files_open)
+        if ( config[dev]->files_open )
         {
             i = 0;
             while ( config[dev]->files_open[ i++ ].type )
@@ -246,7 +246,7 @@ void init_fopen( SDevice **config )
                 filter = gtk_file_filter_new();
                 gtk_file_filter_set_name( filter, config[dev]->files_open[i].name );
                 ext = 0;
-                while ( config[dev]->files_open[i].type[ext].process )
+                while ( config[dev]->files_open[i].type[ext].extention )
                 {
                     /* this SHIT is for case insensitiveness */
                     char *extop;
@@ -269,6 +269,7 @@ void init_fopen( SDevice **config )
                 }
                 gtk_file_chooser_add_filter( GTK_FILE_CHOOSER(dialog_open), filter );
                 i ++;
+                curf ++;
             }
         }
 }
@@ -300,10 +301,10 @@ void signal_open( GtkToolButton *toolbutton, gpointer user_data )
         for ( curf = 0; curf < filter_count; curf++ )
         {
             i = 0;
-            while ( filters[curf].type[i].process )
+            while ( filters[curf].type[i].extention )
             {
                 if ( strcasecmp( ext, filters[curf].type[i].extention ) == 0 )
-                    if ( filters[curf].type->process( filename ) == 0 )
+                    if ( filters[curf].type[i].process( filename ) == 0 )
                     {
                         curf = filter_count;    // me thinks it's not very smart, but i don't see any other choise
                         break;

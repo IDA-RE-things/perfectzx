@@ -87,11 +87,11 @@ void emul_init()
 	sync_init   = sound_alsa_init;
 	sync_uninit = sound_alsa_uninit;
 
-	sync_wait   = sound_pulse_flush;
+	/*sync_wait   = sound_pulse_flush;
 	sync_start  = sync_dumb;
 	sync_stop   = sync_dumb;
 	sync_init   = sound_pulse_init;
-	sync_uninit = sound_pulse_uninit;
+	sync_uninit = sound_pulse_uninit;*/
 
     printf("Initializing video...\n");
     video_init();

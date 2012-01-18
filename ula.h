@@ -5,6 +5,7 @@
 
 extern Z80EX_CONTEXT *zxcpu;
 extern unsigned long zxcpu_tstates;
+extern unsigned long zxcpu_tstates_main;
 extern unsigned long zxcpu_tstates_frame;
 extern unsigned long zxcpu_int_start;
 extern unsigned long zxcpu_int_end;

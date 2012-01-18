@@ -56,11 +56,13 @@ typedef struct
 } SMachineConfig;
 
 extern unsigned long zxcpu_tstates_frame;
-extern SDevice zxdevice_sinclair128;
+extern SDevice zxdevice_pentagon128;
 extern SDevice zxdevice_gmx;
 extern SDevice zxdevice_ay;
 extern SDevice zxdevice_megaay;
 extern SDevice zxdevice_sid;
 extern SDevice zxdevice_kempston_mouse;
+extern SDevice zxdevice_saa;
+extern SDevice zxdevice_tape;
 
 #endif

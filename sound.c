@@ -89,3 +89,4 @@ void add_sound_nf( unsigned begin, unsigned end, unsigned measures, signed l, si
 }
 
 void (*add_sound)( unsigned begin, unsigned end, unsigned measures, signed l, signed r ) = add_sound_fi;
+//void (*add_sound)( unsigned begin, unsigned end, unsigned measures, signed l, signed r ) = add_sound_nf;

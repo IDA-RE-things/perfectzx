@@ -10,5 +10,6 @@ gmon*
 bin/
 obj/
 Snapshots/
+Tapes/
 z80ex*/
 stuff/

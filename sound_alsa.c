@@ -11,7 +11,7 @@ void sound_alsa_init()
     snd_pcm_hw_params_t *hw_params;
     unsigned rate = 48000;
 
-    ret = snd_pcm_open( &sndh, "hw:0,0", SND_PCM_STREAM_PLAYBACK, 0 );
+    ret = snd_pcm_open( &sndh, "default", SND_PCM_STREAM_PLAYBACK, 0 );
     if ( ret < 0 )
     {
     	fprintf (stderr, "cannot open audio device (%s)\n",

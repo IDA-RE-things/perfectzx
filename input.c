@@ -15,21 +15,33 @@ unsigned zxkey_bind_count = 0;
 volatile unsigned char zxkey_matrix[8];
 volatile unsigned zxmouse_x, zxmouse_y, zxmouse_but;
 
-void input_add_zxkey_bind(const char *key_code, const char *zxkey)
+void input_add_zxkey_bind( const char *key_code, char *zxkey )
 {
     unsigned i;
-    zxkey_bind = (ZXKEYBIND *)realloc(zxkey_bind, (zxkey_bind_count + 1) * sizeof(ZXKEYBIND));
+    keyhardcode keycode;
+    char *zxk;
 
     for ( i = 0; i < (sizeof(keymap)/sizeof(KEYMAP)); i ++ )
         if ( strcmp( key_code, keymap[i].name ) == 0 )
-            zxkey_bind[zxkey_bind_count].keycode = keymap[i].key;
-    for ( i = 0; i < (sizeof(zxkeymap)/sizeof(ZXKEYMAP)); i ++ )
-        if ( strcmp(zxkey, zxkeymap[i].name ) == 0)
-        {
-            //printf( "Key: %d\n", zxkey_bind[zxkey_bind_count].keycode );
-            zxkey_bind[zxkey_bind_count].zxkey = zxkeymap[i].key;
-        }
-    zxkey_bind_count++;
+            keycode = keymap[i].keyval;
+
+    zxk = strtok( zxkey, " " );
+    while ( zxk )
+    {
+        zxkey_bind = (ZXKEYBIND *)realloc(zxkey_bind, (zxkey_bind_count + 1) * sizeof(ZXKEYBIND));
+
+        for ( i = 0; i < (sizeof(zxkeymap)/sizeof(ZXKEYMAP)); i ++ )
+            if ( strcmp( zxk, zxkeymap[i].name ) == 0)
+            {
+                //printf( "Key: %d\n", zxkey_bind[zxkey_bind_count].keycode );
+                zxkey_bind[zxkey_bind_count].zxkey = zxkeymap[i].key;
+                break;
+            }
+        zxkey_bind[zxkey_bind_count].keycode = keycode;
+
+        zxk = strtok( NULL, " " );
+        zxkey_bind_count++;
+    }
 }
 
 void input_delete_zxkey_bindings()
@@ -41,6 +53,7 @@ void input_delete_zxkey_bindings()
 int input_event_keyboard(unsigned short key, int pressed)
 {
     unsigned i;
+    //printf( "Key: %.2X\n", key );
     for ( i = 0; i < zxkey_bind_count; i ++ )
         if ( zxkey_bind[i].keycode == key )
         {
@@ -51,8 +64,15 @@ int input_event_keyboard(unsigned short key, int pressed)
                 zxkey_matrix[zxkey_bind[i].zxkey >> 4] |= (1 << (zxkey_bind[i].zxkey & 0xF));
             //printf( "Key: %.2X %.2X\n", zxkey_matrix[0], zxkey_matrix[4] );
 
-            break;
+            //break;
         }
+
+    printf("%x %d mtrx: ",key,pressed);
+    for ( i = 0; i < 8; i ++ )
+    {
+        printf("%.2x ",zxkey_matrix[i] );
+    }
+    printf("\n");
 
     return ( 1 );
 }

@@ -47,8 +47,12 @@ static gboolean screen_update(GtkWidget *area, GdkEventExpose *event, GPtrArray 
 
 static gboolean event_key(GtkWidget *window, GdkEventKey *event, GPtrArray *parray)
 {
-    //printf( "Key: %d\n", event->keyval );
-    return input_event_keyboard(event->hardware_keycode, (event->type == GDK_KEY_PRESS));
+    guint keyval;
+printf("key %x\n",event->hardware_keycode);
+    gdk_keymap_translate_keyboard_state( NULL, event->hardware_keycode,
+                                         event->state, 0, &keyval, NULL, NULL, NULL);
+    //return input_event_keyboard(event->hardware_keycode, (event->type == GDK_KEY_PRESS));
+    return input_event_keyboard( gdk_keyval_to_upper(event->keyval), (event->type == GDK_KEY_PRESS));
 }
 
 GdkCursor *cursor_blank;

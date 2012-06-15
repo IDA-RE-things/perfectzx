@@ -95,7 +95,7 @@ void video_render_std_s(unsigned long tstate)
     }
 }
 
-void video_render_std(unsigned long tstate)
+void video_render_std_old(unsigned long tstate)
 {
     while (video_last_tstate < tstate)
     {
@@ -140,7 +140,7 @@ void video_render_std(unsigned long tstate)
                     for (; (line_char < 32) && (video_last_tstate < tstate); line_char++)
                     {
                         scr_line = line - 48;
-                        unsigned char pattern, attribute;
+                        unsigned pattern, attribute;
                         pattern = video_memory[line_char | std_adr_ptrn[scr_line]];
                         attribute = video_memory[line_char | std_adr_attr[scr_line]];
                         if ( (attribute & 0x80) && std_flash_counter >= 16 )
@@ -165,6 +165,104 @@ void video_render_std(unsigned long tstate)
                         vid_buffer_out[(out_x++) + (out_y*320)] = video_palette[video_border];
                     }
                 }
+            }
+        }
+    }
+}
+
+void video_render_std(unsigned long tstate)
+{
+    static int line, line_ts;
+    static int out_y;
+    static video_pixel *out_p;
+
+    while (video_last_tstate < tstate)
+    {
+        if ( video_last_tstate == 0 )
+            std_flash_counter = (std_flash_counter + 1) % 32;
+
+        // top + left nonviewable area
+        if (video_last_tstate < ( (48-24)*224 + (0+32-16) ) )
+        {
+            video_last_tstate = 224 * (48-24) + (0+32-16);
+            line = (48-24);
+            line_ts = (0+32-16);
+
+            out_y = 0;
+            out_p = vid_buffer_out + out_y * 320;
+            continue;
+        }
+        // bottom nonviewable area
+        if (video_last_tstate >= ( (48+192+24)*224 ) )
+        {
+            video_last_tstate = zxcpu_tstates_frame;//224 * 312;
+            continue;
+        }
+        // viewable area
+        // right nonviewable area
+        if ( line_ts >= (32+128+16) )
+        {
+            video_last_tstate += (224 - (32+128+16)) + (0+32-16);
+            line ++;
+            line_ts = (0+32-16);
+
+            out_y ++;
+            out_p = vid_buffer_out + out_y * 320;
+            continue;
+        }
+
+        if (line >= 48 && line < (48+192) && line_ts >= 32 &&  line_ts < (32+128))
+        {
+            unsigned line_char, scr_line;
+            unsigned char *ptrn_p, *attr_p;
+
+            line_char = (line_ts-32)/4;
+            video_last_tstate = line*224+line_char*4+32;  // align tstates
+            scr_line = line - 48;
+
+            ptrn_p = video_memory + std_adr_ptrn[scr_line] + line_char;
+            attr_p = video_memory + std_adr_attr[scr_line] + line_char;
+            for (; (line_char < 32) && (video_last_tstate < tstate); line_char++)
+            {
+                unsigned pattern, attribute;
+                video_pixel color_ink, color_paper;
+
+                pattern = *(ptrn_p ++);
+                attribute = *(attr_p ++);
+
+                color_ink = video_palette[std_ink[attribute]];
+                color_paper = video_palette[std_paper[attribute]];
+
+                if ( (attribute & 0x80) && std_flash_counter >= 16 )
+                    pattern ^= 0xFF;
+
+                unsigned i;
+                for ( i = 0; i < 8; i++ )
+                {
+                    *( out_p ++ ) = ( pattern & ( 1 << (7-i) ) ) ? color_ink : color_paper;
+                }
+                video_last_tstate += 4;
+                line_ts += 4;
+            }
+        }
+        // border
+        else
+        {
+            unsigned long border_end;
+
+            border_end = (line >= 48 && line < (48+192) && line_ts < (32+128)) ? (line*224+32) : ((line*224)+32+128+16);//((line+1)*224);
+            if ( tstate < border_end )
+                border_end = tstate;
+
+            video_pixel color = video_palette[video_border];
+
+            while( video_last_tstate < border_end )
+            {
+                *( out_p ++ ) = color;
+                *( out_p ++ ) = color;
+
+                video_last_tstate ++;
+                line_ts ++;
             }
         }
     }

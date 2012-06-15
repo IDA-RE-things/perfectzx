@@ -28,8 +28,8 @@
 				</Linker>
 			</Target>
 			<Target title="Profile">
-				<Option output="bin/Debug/perfectzx" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj/Debug/" />
+				<Option output="bin/Profile/perfectzx" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Profile/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>

@@ -41,6 +41,8 @@ static struct saa_t
 	int sound[2];
 	int last_sound[2];
 	unsigned long last_tstate;
+
+	sound_state_t sound_state;
 } saa;
 
 #define GET_COUNTER_EVENT(e,c,p)    \
@@ -147,7 +149,7 @@ static unsigned saa_tick( struct saa_t *saa, unsigned cycles )
             static unsigned tmp;
             tmp = ( saa->noise_reg[c] >> 15 ) & 1;
             saa->noise_reg[c] <<= 1;
-            saa->noise_reg[c] |= ( ( saa->noise[c] ^ ( saa->noise_reg[c] >> 14 ) ) & 1 ) ^ 1;
+            saa->noise_reg[c] |= ( ( saa->noise[c] ^ ( saa->noise_reg[c] >> 15 ) ) & 1 ) ^ 1;
 
             saa->noise[c] = tmp;
             saa->noise_count[c] = 0;
@@ -224,9 +226,10 @@ static void process_saa( unsigned long tstate )
                        ( dac_val[ay.last_sound[0]] + dac_val[ay.last_sound[1]]*0.7 + dac_val[ay.last_sound[2]]*0.2 ) * volume_ay,
                        ( dac_val[ay.last_sound[2]] + dac_val[ay.last_sound[1]]*0.7 + dac_val[ay.last_sound[0]]*0.2 ) * volume_ay );*/
 
-            add_sound( saa.last_tstate, last_tstate, 80000,
-                       saa.last_sound[0] * volume_saa,
-                       saa.last_sound[1] * volume_saa );
+            add_sound_hp( saa.last_tstate, last_tstate, 80000,
+                          saa.last_sound[0] * volume_saa,
+                          saa.last_sound[1] * volume_saa,
+                          &saa.sound_state );
             saa.last_tstate = last_tstate;
             //memcpy( saa.last_sound, saa.sound, sizeof(saa.sound) );
             saa.last_sound[0] = saa.sound[0];

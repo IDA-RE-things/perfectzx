@@ -1,27 +1,36 @@
 #ifndef PZX_SOUND
 #define PZX_SOUND
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef signed short SNDSAMPLE;
 
 typedef struct
 {
     SNDSAMPLE l, r;
-}
-SNDFRAME;
+} SNDFRAME;
 
 #define SNDFRAME_LEN    20
+
+typedef struct
+{
+    SNDSAMPLE l, r;
+    signed last_l, last_r;
+} sound_state_t;
 
 extern SNDFRAME *sound_buffer;
 extern unsigned long bufferFrames;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 extern void (*add_sound)( unsigned begin, unsigned end, unsigned measures, signed l, signed r );
+extern void (*add_sound_hp)( unsigned begin, unsigned end, unsigned measures, signed l, signed r, sound_state_t *state );
+
 void add_sound_fi( unsigned begin, unsigned end, unsigned measures, signed l, signed r );
 void add_sound_ff( unsigned begin, unsigned end, unsigned measures, signed l, signed r );
 void add_sound_nf( unsigned begin, unsigned end, unsigned measures, signed l, signed r );
+
+void add_sound_hp_fi( unsigned begin, unsigned end, unsigned measures, signed l, signed r, sound_state_t *state );
 
 void sound_oss_init();
 void sound_oss_uninit();

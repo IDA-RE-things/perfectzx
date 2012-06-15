@@ -4,7 +4,7 @@
 
 static unsigned long last_tstate;
 
-static signed volume_ay = 10000;
+static signed volume_ay = 7500;
 
 static const double dac_val[16]=
 {
@@ -28,15 +28,15 @@ static const double dac_val[16]=
 
 static struct ay_t
 {
-	unsigned char reg_latch;
+	unsigned reg_latch;
 	struct
 	{
-	   	unsigned short tone_period[3];
-    	unsigned char noise_period;
-		unsigned char control;
-		unsigned char channel_vol[3];
-		unsigned short envelope_period;
-        unsigned char envelope_shape;
+	   	unsigned tone_period[3];
+    	unsigned noise_period;
+		unsigned control;
+		unsigned channel_vol[3];
+		unsigned envelope_period;
+        unsigned envelope_shape;
 	};
 
 	unsigned tone_count[3];
@@ -45,12 +45,14 @@ static struct ay_t
 	unsigned envelope_phase;
 	unsigned envelope_state;
 	int signal[3];
-	unsigned short noise_reg;
+	unsigned noise_reg;
 	int noise_signal;
 
 	unsigned char sound[3];
 	unsigned char last_sound[3];
 	unsigned long last_tstate;
+
+	sound_state_t ay_state;
 } ay;
 
 static void ay_tick( struct ay_t *ay )
@@ -65,13 +67,14 @@ static void ay_tick( struct ay_t *ay )
         { ay->signal[2]^=1; ay->tone_count[2]=0; }
     if ( ++ay->noise_count >= ( ( ay->noise_period & 0x1F ) << 1 ) )
 	{
-		unsigned char tmp = ( ay->noise_reg >> 15 ) & 1;
+		unsigned tmp = ( ay->noise_reg >> 15 ) & 1;
 		ay->noise_reg <<= 1;
-		ay->noise_reg |= ( ( ay->noise_signal ^ ( ay->noise_reg >> 14 ) ) & 1 ) ^ 1;
+		ay->noise_reg |= ( ( ay->noise_signal ^ ( ay->noise_reg >> (13+1) ) ) & 1 ) ^ 1;
 		ay->noise_signal = tmp;
 		ay->noise_count = 0;
 	}
 
+    // TODO: rewrite this shit (optimize!)
     if ( ( ++ay->envelope_count ) >= ( ay->envelope_period << 1 ) )
     {
         ay->envelope_count=0;
@@ -112,10 +115,10 @@ static void ay_tick( struct ay_t *ay )
 
 	for ( c = 0; c < 3; c ++ )
     {
-		unsigned char signl = ( ( ( ay->control & ( 1 << c ) ) ? 1 : ay->signal[c] ) &
-                                ( ( ay->control & ( 8 << c ) ) ? 1 : ay->noise_signal ) );
+		int signl = ( ( ( ay->control & ( 1 << c ) ) ? 1 : ay->signal[c] ) &
+                      ( ( ay->control & ( 8 << c ) ) ? 1 : ay->noise_signal ) );
 		unsigned char ampl = ( ay->channel_vol[c] & 0x10 ) ? ay->envelope_state : ( ay->channel_vol[c] & 0xF );
-        ay->sound[c] = ( signl & 1 ) ? ampl : 0;
+        ay->sound[c] = signl ? ampl : 0;
     }
 }
 
@@ -127,9 +130,13 @@ static void process_ay( unsigned long tstate )
         last_tstate += 16;
         if ( memcmp( ay.sound, ay.last_sound, sizeof(ay.sound) ) || last_tstate >= zxcpu_tstates_frame )
         {
-            add_sound( ay.last_tstate, last_tstate, zxcpu_tstates_frame,
+            /*add_sound( ay.last_tstate, last_tstate, zxcpu_tstates_frame,
                        ( dac_val[ay.last_sound[0]] + dac_val[ay.last_sound[1]]*0.7 + dac_val[ay.last_sound[2]]*0.2 ) * volume_ay,
-                       ( dac_val[ay.last_sound[2]] + dac_val[ay.last_sound[1]]*0.7 + dac_val[ay.last_sound[0]]*0.2 ) * volume_ay );
+                       ( dac_val[ay.last_sound[2]] + dac_val[ay.last_sound[1]]*0.7 + dac_val[ay.last_sound[0]]*0.2 ) * volume_ay );*/
+            add_sound_hp( ay.last_tstate, last_tstate, zxcpu_tstates_frame,
+                          ( dac_val[ay.last_sound[0]] + dac_val[ay.last_sound[1]]*0.7 + dac_val[ay.last_sound[2]]*0.2 ) * volume_ay,
+                          ( dac_val[ay.last_sound[2]] + dac_val[ay.last_sound[1]]*0.7 + dac_val[ay.last_sound[0]]*0.2 ) * volume_ay,
+                          &ay.ay_state );
             ay.last_tstate = last_tstate;
             memcpy( ay.last_sound, ay.sound, sizeof(ay.sound) );
         }

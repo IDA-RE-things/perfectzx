@@ -59,7 +59,7 @@ void sound_alsa_flush()
             continue;
         }
         towr -= res;
-        sndb += res*2;
+        sndb += res;
     }
 
     memset( sound_buffer, 0, bufferFrames * sizeof( SNDFRAME ) );

@@ -2070,7 +2070,7 @@
 	"sync_timer.h"
 	"sound.h"
 
-1339751643 source:/home/las/programming/perfectzx/main.c
+1339965134 source:/home/las/programming/perfectzx/main.c
 	"main.h"
 	<gtk/gtk.h>
 	<gdk/gdkx.h>
@@ -2116,23 +2116,23 @@
 1334953018 /usr/include/gtk-2.0/gdk/gdkprivate.h
 	<gdk/gdk.h>
 
-1339750948 source:/home/las/programming/perfectzx/input.c
+1339965476 source:/home/las/programming/perfectzx/input.c
 	"main.h"
 	"input.h"
 	"input_keymap.h"
 	"input_zxkeymap.h"
 
-1316342769 /home/las/programming/perfectzx/input.h
+1339965081 /home/las/programming/perfectzx/input.h
 	"emul.h"
-
-1339665686 /home/las/programming/perfectzx/input_keymap.h
 	<gdk/gdkkeys.h>
+
+1339965209 /home/las/programming/perfectzx/input_keymap.h
 	<gdk/gdkkeysyms.h>
 
 1334953018 /usr/include/gtk-2.0/gdk/gdkkeysyms.h
 	<gdk/gdkkeysyms-compat.h>
 
-1316342769 /home/las/programming/perfectzx/input_zxkeymap.h
+1339965049 /home/las/programming/perfectzx/input_zxkeymap.h
 
 1334945712 /usr/include/glib-2.0/glib/ghostutils.h
 	<glib/gtypes.h>
@@ -2243,7 +2243,7 @@
 
 1337425444 /home/las/programming/perfectzx/sound.h
 
-1320482836 source:/home/las/programming/perfectzx/sound_alsa.c
+1339783139 source:/home/las/programming/perfectzx/sound_alsa.c
 	<stdio.h>
 	<alsa/asoundlib.h>
 	"sound.h"
@@ -2384,9 +2384,9 @@
 	"../main.h"
 	"../devices.h"
 
-1316342769 /home/las/programming/perfectzx/wd1793.h
+1340182817 /home/las/programming/perfectzx/wd1793.h
 
-1316342769 source:/home/las/programming/perfectzx/wd1793.c
+1340183259 source:/home/las/programming/perfectzx/wd1793.c
 	"main.h"
 	<stdio.h>
 	"wd1793.h"
@@ -2558,7 +2558,7 @@
 1334953020 /usr/include/gtk-2.0/gtk/gtkcomboboxtext.h
 	<gtk/gtkcombobox.h>
 
-1337426012 source:/home/las/programming/perfectzx/devices/pentagon128.c
+1340113961 source:/home/las/programming/perfectzx/devices/pentagon128.c
 	"../main.h"
 	"../devices.h"
 	"../sound.h"
@@ -2615,7 +2615,7 @@
 
 1326368396 /home/las/programming/perfectzx/tape.h
 
-1326485063 source:/home/las/programming/perfectzx/tape.c
+1339964568 source:/home/las/programming/perfectzx/tape.c
 	<stdio.h>
 	<malloc.h>
 	"ula.h"

@@ -3,22 +3,22 @@
 
 typedef struct
 {
-    unsigned char command;  // not sure if it is needed
-    unsigned char status;
+    unsigned command;  // not sure if it is needed
+    unsigned status;
     unsigned char track, sector;
-    unsigned char data;
+    unsigned data;
     unsigned out_status;
 
     unsigned last_clock;
     int count;
     int state;
-    unsigned char dsr;
+    unsigned dsr;
 
     struct
     {
         unsigned track;
         unsigned position;
-
+        unsigned long clock;
     } disk;
 } wd1793_t;
 

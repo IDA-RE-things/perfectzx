@@ -115,6 +115,7 @@ static int port_out(Z80EX_CONTEXT *cpu, Z80EX_WORD port, Z80EX_BYTE value)
             }
             else
                 wd1793_write( &fdc, port >> 5, value );
+            printf("wd %x wr %x\n", port&0xff, value);
         }
     }
 
@@ -154,6 +155,7 @@ static int port_in(Z80EX_CONTEXT *cpu, Z80EX_WORD port, Z80EX_BYTE *value)
             }
             else
                 *value = wd1793_read( &fdc, port >> 5 );
+            //printf("wd %x rd %x\n", port&0xff, *value);
         }
     }
 

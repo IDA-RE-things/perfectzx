@@ -45,14 +45,73 @@ static gboolean screen_update(GtkWidget *area, GdkEventExpose *event, GPtrArray 
     return FALSE;//TRUE;
 }
 
-static gboolean event_key(GtkWidget *window, GdkEventKey *event, GPtrArray *parray)
+#define KEYSTACK_SIZE   16
+static struct
 {
     guint keyval;
-printf("key %x\n",event->hardware_keycode);
+    guint fallback;
+}
+keystack[KEYSTACK_SIZE];
+
+static int process_key_event( guint keyval, guint fallback, int pressed )
+{
+    int i,id;
+
+    id = -1;
+    for ( i = 0; i < KEYSTACK_SIZE; i ++ )
+    {
+        if ( id < 0 && keystack[i].keyval == -1 )
+            id = i;
+
+        if ( keystack[i].fallback == fallback )
+        {
+            id = i;
+            break;
+        }
+    }
+
+    if ( id < 0 )
+        return 0;
+
+    if ( keystack[id].keyval != -1 )
+        input_event_keyboard( keystack[id].keyval, 0 );
+
+    if ( pressed )
+    {
+        keystack[id].keyval = keyval;
+        keystack[id].fallback = fallback;
+    }
+    else
+    {
+        keystack[id].keyval = -1;
+        keystack[id].fallback = -1;
+    }
+
+    for ( i = 0; i < zxkey_bind_count; i ++ )
+        if ( zxkey_bind[i].keycode == keyval )
+            break;
+    if ( i == zxkey_bind_count )
+        keyval = fallback;
+
+    input_event_keyboard( keyval, pressed );
+
+    return 1;
+}
+
+static gboolean event_key(GtkWidget *window, GdkEventKey *event, GPtrArray *parray)
+{
+    guint keyval, fallback;
+//printf("key %x\n",event->hardware_keycode);
     gdk_keymap_translate_keyboard_state( NULL, event->hardware_keycode,
                                          event->state, 0, &keyval, NULL, NULL, NULL);
+    gdk_keymap_translate_keyboard_state( NULL, event->hardware_keycode,
+                                         0, 0, &fallback, NULL, NULL, NULL);
+
     //return input_event_keyboard(event->hardware_keycode, (event->type == GDK_KEY_PRESS));
-    return input_event_keyboard( gdk_keyval_to_upper(event->keyval), (event->type == GDK_KEY_PRESS));
+    //return input_event_keyboard( gdk_keyval_to_upper(keyval), (event->type == GDK_KEY_PRESS));
+    process_key_event( gdk_keyval_to_lower(keyval), fallback, (event->type == GDK_KEY_PRESS) );
+
+    return TRUE;
 }
 
 GdkCursor *cursor_blank;
@@ -387,6 +446,8 @@ int main( int argc, char *argv[] )
     g_signal_connect( scr_area, "button-release-event", G_CALLBACK(event_button), NULL );
     g_signal_connect( scr_area, "motion-notify-event", G_CALLBACK(event_motion), NULL );
     g_signal_connect( scr_area, "enter-notify-event", G_CALLBACK(event_crossing), NULL );
+
+    memset( keystack, -1, sizeof(keystack) );
 
     cursor_blank = gdk_cursor_new( GDK_BLANK_CURSOR );
     gdk_display_get_pointer( gtk_widget_get_display( scr_area ), NULL, &mouse_last_x, &mouse_last_y, NULL );

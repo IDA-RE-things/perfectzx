@@ -49,10 +49,21 @@ static void drive_step( wd1793_t *device )
 
 static void process_wd1793( wd1793_t *device, unsigned clock_cycle )
 {
+    device->disk.clock += clock_cycle - device->last_clock;
+    device->disk.clock %= CLOCKS_PER_FRAME * 10;
+
     while ( device->last_clock < clock_cycle )
     {
         if ( device->state == WD1793_IDLE )
             device->last_clock = clock_cycle;
+    }
+
+    if ( device->state == WD1793_TYPE1 )
+    {
+        if ( device->disk.clock < 2500 )
+            device->status |= STAT_INDEX;
+        else
+            device->status &= ~STAT_INDEX;
     }
 }
 
@@ -71,32 +82,55 @@ static void process_cmd( wd1793_t *device )
         else
             device->out_status &= ~WD1793_HLD;
 
-        if ( (cmd & 0xF0) == 0 )
-        {
-            device->track = 0xFF;
-            device->data = 0;
-        }
-
         if ( (cmd & 0xE0) == 0 )
         {
             // seek and restore commands
+            if ( (cmd & 0x10) == 0 )
+            {
+                // restore command
+                device->track = 0xFF;
+                device->data = 0;
+            }
+
             device->dsr = device->data;
 
-            if ( device->dsr > device->track )
+            while ( device->dsr != device->track )
             {
+                if ( device->dsr > device->track )
+                {
+                    device->out_status |= WD1793_DIR;
+                    device->track ++;
+                }
+                else
+                {
+                    device->out_status &= ~WD1793_DIR;
+                    device->track --;
+                }
 
-            }
-            else if ( device->dsr > device->track )
-            {
-
-            }
-            else
-            {
-
+                drive_step( device );
             }
         }
+        else
+        {
+            // step commands
+            if ( (cmd & 0x60) == 4 )        // step in
+                device->out_status |= WD1793_DIR;
+            else if ( (cmd & 0x60) == 6 )   // step out
+                device->out_status &= ~WD1793_DIR;
 
-        if ( !(device->out_status & WD1793_DIR) && (device->disk.track == 0) )
+            if ( FLAG_U(cmd) )
+            {
+                if ( device->out_status & WD1793_DIR )
+                    device->track ++;
+                else
+                    device->track --;
+            }
+
+            drive_step( device );
+        }
+
+
+        /*if ( !(device->out_status & WD1793_DIR) && (device->disk.track == 0) )
         {
             device->track = 0;
             device->count = 1;  // no delay
@@ -105,21 +139,33 @@ static void process_cmd( wd1793_t *device )
         {
             drive_step( device );
             device->count = pos_delays[FLAG_R(cmd)];
-        }
+        }*/
 
         device->state = WD1793_TYPE1;
+
+        // HACK
+        device->status &= ~(STAT_BUSY | STAT_TRACK_0);
+        if ( device->disk.track == 0 )
+        {
+            device->status |= STAT_TRACK_0;
+            device->track = 0;
+        }
+        device->out_status |= WD1793_INTRQ;
     }
     else if ( (cmd & 0x40) == 0 )
     {
         // type II command
+        device->status |= STAT_BUSY;
     }
     else if ( (cmd & 0x30) == 0x01 )
     {
         // type IV command
+        device->status &= ~STAT_BUSY;
     }
     else
     {
         // type III command
+        device->status |= STAT_BUSY;
     }
 }
 

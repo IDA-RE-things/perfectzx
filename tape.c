@@ -12,7 +12,7 @@ static int tape_running;
 static char *tape_cnt;
 static int tape_size;
 
-static int signal;
+static int tape_signal;
 static int tape_pos;
 static int next_change;
 static int tape_state;
@@ -43,18 +43,18 @@ void tape_process( unsigned long cycles )
                 break;
             case 1:
                 next_change = 2168;
-                signal = !signal;
+                tape_signal = !tape_signal;
                 if ( --state_pos == 0 )
                     tape_state ++;
                 break;
             case 2:
                 next_change = 667;
-                signal = !signal;
+                tape_signal = !tape_signal;
                 tape_state ++;
                 break;
             case 3:
                 next_change = 735;
-                signal = !signal;
+                tape_signal = !tape_signal;
                 tape_state ++;
                 break;
             case 4:
@@ -69,7 +69,7 @@ void tape_process( unsigned long cycles )
             case 5:
             case 6:
                 next_change = (tape_cnt[tape_pos] & (1 << state_pos)) ? 1710 : 855;
-                signal = !signal;
+                tape_signal = !tape_signal;
                 tape_state ++;
                 break;
             case 7:
@@ -92,7 +92,7 @@ int tape_get()
     last_tstate = zxcpu_tstates;
     rpf ++;
 
-    return( signal );
+    return( tape_signal );
 }
 
 void tape_frame()

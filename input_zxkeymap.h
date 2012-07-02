@@ -1,14 +1,4 @@
-typedef struct
-{
-    const char *name;
-    const unsigned char key;
-} ZXKEYMAP;
 
-typedef struct
-{
-    keyhardcode keycode;
-    unsigned char zxkey;
-} ZXKEYBIND;
 
 ZXKEYMAP zxkeymap[] = {
     { "NULL",   0xFF },

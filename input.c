@@ -67,13 +67,6 @@ int input_event_keyboard(unsigned short key, int pressed)
             //break;
         }
 
-    printf("%x %d mtrx: ",key,pressed);
-    for ( i = 0; i < 8; i ++ )
-    {
-        printf("%.2x ",zxkey_matrix[i] );
-    }
-    printf("\n");
-
     return ( 1 );
 }
 

@@ -49,6 +49,7 @@ static void reset()
     p7EFD_state = 0;
     p78FD_state = 0;
     pDFFD_state = 0;
+    trd_act = 0;
     update_ports();
 
     video_memory = RAM_PAGE(5);
@@ -222,7 +223,7 @@ static void init()
 	video_border = 0x00;
 
 	FILE *romf;
-	romf = fopen("ROMs/gmx12.rom", "rb");
+	romf = fopen("roms/gmx12.rom", "rb");
 	res = fread(mem_rom, 0x4000, 8*4, romf);
 	fclose(romf);
 }

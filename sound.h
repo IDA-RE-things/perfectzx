@@ -18,6 +18,8 @@ typedef struct
 {
     SNDSAMPLE l, r;
     signed last_l, last_r;
+    unsigned measures;
+    unsigned last_tstate;
 } sound_state_t;
 
 extern SNDFRAME *sound_buffer;
@@ -31,6 +33,8 @@ void add_sound_ff( unsigned begin, unsigned end, unsigned measures, signed l, si
 void add_sound_nf( unsigned begin, unsigned end, unsigned measures, signed l, signed r );
 
 void add_sound_hp_fi( unsigned begin, unsigned end, unsigned measures, signed l, signed r, sound_state_t *state );
+
+void add_sound_hp_fi_new( sound_state_t *state, unsigned tstate, signed l, signed r );
 
 void sound_oss_init();
 void sound_oss_uninit();

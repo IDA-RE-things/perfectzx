@@ -147,6 +147,69 @@ void add_sound_hp_fi( unsigned begin, unsigned end, unsigned measures, signed l,
     state->r = or;
 }
 
+void add_sound_hp_fi_new( sound_state_t *state, unsigned end, signed l, signed r )
+{
+    unsigned cur_fr, next_fr, fr_len, cur_len;
+    //float ol, or;
+    signed long ol, or;
+    signed dl, dr;
+    unsigned begin = state->last_tstate;
+    unsigned measures = state->measures;
+
+    dl = l - state->last_l;
+    dr = r - state->last_r;
+
+    ol = state->l + dl;
+    or = state->r + dr;
+
+    cur_fr = begin * bufferFrames / measures;
+
+    do
+    {
+        SNDSAMPLE vl, vr;
+
+        next_fr = ( cur_fr + 1 ) * measures / bufferFrames;
+        fr_len = next_fr - cur_fr * measures / bufferFrames;
+
+        if ( next_fr > end )
+            next_fr = end;
+
+        if ( !fr_len )//next_fr == begin )
+        {
+            cur_fr ++;
+            continue;
+        }
+
+        cur_len = next_fr - begin;
+
+        vl = ol * cur_len / fr_len;
+        vr = or * cur_len / fr_len;
+
+        if ( vl )
+            sound_buffer[cur_fr].l += vl;
+        if ( vr )
+            sound_buffer[cur_fr].r += vr;
+
+        ol = ol / 1.01;// * cur_len / fr_len;
+        or = or / 1.01;// * cur_len / fr_len;
+
+        if ( !ol && !or )
+            break;
+
+        begin = next_fr;
+        cur_fr ++;
+    }
+    while ( next_fr < end );
+
+    state->last_l = l;
+    state->last_r = r;
+
+    state->l = ol;
+    state->r = or;
+
+    state->last_tstate = end;
+}
+
 void (*add_sound)( unsigned begin, unsigned end, unsigned measures, signed l, signed r ) = add_sound_fi;
 void (*add_sound_hp)( unsigned begin, unsigned end, unsigned measures, signed l, signed r, sound_state_t *state ) = add_sound_hp_fi;
 //void (*add_sound)( unsigned begin, unsigned end, unsigned measures, signed l, signed r ) = add_sound_nf;

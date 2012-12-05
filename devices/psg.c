@@ -50,7 +50,6 @@ static struct ay_t
 
 	unsigned char sound[3];
 	unsigned char last_sound[3];
-	unsigned long last_tstate;
 
 	sound_state_t ay_state;
 } ay;
@@ -133,11 +132,14 @@ static void process_ay( unsigned long tstate )
             /*add_sound( ay.last_tstate, last_tstate, zxcpu_tstates_frame,
                        ( dac_val[ay.last_sound[0]] + dac_val[ay.last_sound[1]]*0.7 + dac_val[ay.last_sound[2]]*0.2 ) * volume_ay,
                        ( dac_val[ay.last_sound[2]] + dac_val[ay.last_sound[1]]*0.7 + dac_val[ay.last_sound[0]]*0.2 ) * volume_ay );*/
-            add_sound_hp( ay.last_tstate, last_tstate, zxcpu_tstates_frame,
+            /*add_sound_hp( ay.last_tstate, last_tstate, zxcpu_tstates_frame,
                           ( dac_val[ay.last_sound[0]] + dac_val[ay.last_sound[1]]*0.7 + dac_val[ay.last_sound[2]]*0.2 ) * volume_ay,
                           ( dac_val[ay.last_sound[2]] + dac_val[ay.last_sound[1]]*0.7 + dac_val[ay.last_sound[0]]*0.2 ) * volume_ay,
-                          &ay.ay_state );
-            ay.last_tstate = last_tstate;
+                          &ay.ay_state );*/
+            add_sound_hp_fi_new( &ay.ay_state, last_tstate,
+                                 ( dac_val[ay.last_sound[0]] + dac_val[ay.last_sound[1]]*0.7 + dac_val[ay.last_sound[2]]*0.2 ) * volume_ay,
+                                 ( dac_val[ay.last_sound[2]] + dac_val[ay.last_sound[1]]*0.7 + dac_val[ay.last_sound[0]]*0.2 ) * volume_ay );
+            //ay.last_tstate = last_tstate;
             memcpy( ay.last_sound, ay.sound, sizeof(ay.sound) );
         }
     }
@@ -147,13 +149,14 @@ static void reset()
 {
     process_ay( zxcpu_tstates );
     memset( &ay, 0, sizeof( struct ay_t ) );
+    ay.ay_state.measures = zxcpu_tstates_frame;
 }
 
 static void frame()
 {
     process_ay( zxcpu_tstates_frame );
     last_tstate = 0;
-    ay.last_tstate = 0;
+    ay.ay_state.last_tstate = 0;
 }
 
 static int port_out(Z80EX_CONTEXT *cpu, Z80EX_WORD port, Z80EX_BYTE value)
@@ -227,7 +230,8 @@ static int port_in(Z80EX_CONTEXT *cpu, Z80EX_WORD port, Z80EX_BYTE *value)
 static void init()
 {
 	last_tstate = 0;
-	ay.last_tstate = 0;
+	ay.ay_state.last_tstate = 0;
+	ay.ay_state.measures = zxcpu_tstates_frame;
 	memset( ay.last_sound, 0, sizeof(ay.last_sound) );
 }
 

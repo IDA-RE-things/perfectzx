@@ -3,6 +3,7 @@
 #include "wd1793.h"
 
 #define CLOCKS_PER_FRAME    (1000000/50)
+#define CLOCKS_PER_ROTATION (CLOCKS_PER_FRAME*10)
 
 #define STAT_NOT_READY  0x80
 #define STAT_WR_PROTECT 0x40
@@ -47,10 +48,11 @@ static void drive_step( wd1793_t *device )
     }
 }
 
+
 static void process_wd1793( wd1793_t *device, unsigned clock_cycle )
 {
     device->disk.clock += clock_cycle - device->last_clock;
-    device->disk.clock %= CLOCKS_PER_FRAME * 10;
+    device->disk.clock %= CLOCKS_PER_ROTATION;
 
     while ( device->last_clock < clock_cycle )
     {

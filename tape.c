@@ -33,7 +33,7 @@ void tape_process( unsigned long cycles )
         {
             case 0:
                 // start block
-                if ( tape_pos > tape_size )
+                if ( tape_pos >= tape_size )
                     return;
 
                 block_size = *(unsigned short *)(tape_cnt + tape_pos);
